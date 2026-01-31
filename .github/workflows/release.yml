@@ -15,12 +15,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # - platform: "macos-latest" # for Arm based macs (M1 and above).
-          #   args: "--target aarch64-apple-darwin"
-          # - platform: "macos-latest" # for Intel based macs.
-          #   args: "--target x86_64-apple-darwin"
-          # - platform: "ubuntu-22.04" # for Tauri v1 you could replace this with ubuntu-20.04.
-          #   args: ""
           - platform: "windows-latest"
             args: ""
     runs-on: ${{ matrix.platform }}
@@ -35,10 +29,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_PRIVATE_KEY_PASSWORD }}
-          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
-          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          R2_BUCKET: ${{ secrets.R2_BUCKET }}
           ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
           ENCRYPTION_IV: ${{ secrets.ENCRYPTION_IV }}
           HMAC_KEY: ${{ secrets.HMAC_KEY }}
@@ -56,12 +46,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # - platform: "macos-latest" # for Arm based macs (M1 and above).
-          #   args: "--target aarch64-apple-darwin"
-          # - platform: "macos-latest" # for Intel based macs.
-          #   args: "--target x86_64-apple-darwin"
-          # - platform: "ubuntu-22.04" # for Tauri v1 you could replace this with ubuntu-20.04.
-          #   args: ""
           - platform: "windows-latest"
             args: ""
     runs-on: ${{ matrix.platform }}
@@ -76,10 +60,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_PRIVATE_KEY_PASSWORD }}
-          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
-          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          R2_BUCKET: ${{ secrets.R2_BUCKET }}
           ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
           ENCRYPTION_IV: ${{ secrets.ENCRYPTION_IV }}
           HMAC_KEY: ${{ secrets.HMAC_KEY }}

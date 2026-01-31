@@ -38,6 +38,8 @@ yarn-error.log*
 
 # keys
 /src-tauri/.config
+*.key
+*.pub
 
 # typescript
 *.tsbuildinfo
