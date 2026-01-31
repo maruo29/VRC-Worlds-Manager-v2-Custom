@@ -59,7 +59,7 @@ export const Changelog: FC<Props> = ({ changes }) => {
       </ScrollArea>
       <div className="flex justify-center p-4">
         <a
-          href={`https://github.com/Raifa21/VRC-Worlds-Manager-v2/blob/develop/CHANGELOG.md`}
+          href={`https://github.com/maruo29/VRC-Worlds-Manager-v2-Custom/blob/main/CHANGELOG_CUSTOM.md`}
           target="_blank"
           rel="noopener noreferrer"
         >

@@ -74,6 +74,21 @@ pub fn restore_from_backup(
             
             FileService::write_custom_data(&custom_data).map_err(|e| e.to_string())?;
             log::info!("Restored custom_data.json");
+
+            // Apply folder colors to in-memory folders
+            {
+                let mut folders_lock = folders.write().map_err(|e| {
+                    log::error!("Failed to acquire write lock for folders: {}", e);
+                    "Failed to acquire write lock for folders".to_string()
+                })?;
+                
+                for folder in folders_lock.iter_mut() {
+                    if let Some(color) = custom_data.get_folder_color(&folder.folder_name) {
+                        folder.color = Some(color.clone());
+                    }
+                }
+                log::info!("Applied folder colors from custom_data to in-memory folders");
+            }
         } else {
              // If custom_data.json doesn't exist in backup, we might want to clear existing custom data
              // or keep it as is. For safety, let's keep it as is, or reset to default if full restore is implied.
