@@ -1,0 +1,566 @@
+warning: vrc-worlds-manager@1.3.0-rc.0: Found .env file, loading environment variables for development
+warning: unused import: `tauri_plugin_updater::UpdaterExt`
+  --> src\lib.rs:11:5
+   |
+11 | use tauri_plugin_updater::UpdaterExt;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `AppHandle` and `Manager`
+ --> src\api\common.rs:4:13
+  |
+4 | use tauri::{AppHandle, Manager};
+  |             ^^^^^^^^^  ^^^^^^^
+
+warning: unused imports: `Duration` and `sleep`
+ --> src\api\common.rs:5:19
+  |
+5 | use tokio::time::{sleep, Duration};
+  |                   ^^^^^  ^^^^^^^^
+
+warning: unused import: `crate::api::RateLimitStore`
+ --> src\api\common.rs:7:5
+  |
+7 | use crate::api::RateLimitStore;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `definitions::VRChatAuthPhase`
+ --> src\api\auth\mod.rs:4:9
+  |
+4 | pub use definitions::VRChatAuthPhase;
+  |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `definitions::GroupInstanceCreateAllowedType`
+ --> src\api\group\mod.rs:4:9
+  |
+4 | pub use definitions::GroupInstanceCreateAllowedType;
+  |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `definitions::GroupInstanceCreatePermission`
+ --> src\api\group\mod.rs:5:9
+  |
+5 | pub use definitions::GroupInstanceCreatePermission;
+  |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `definitions::GroupMemberVisibility`
+ --> src\api\group\mod.rs:7:9
+  |
+7 | pub use definitions::GroupMemberVisibility;
+  |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `definitions::GroupRole`
+ --> src\api\group\mod.rs:8:9
+  |
+8 | pub use definitions::GroupRole;
+  |         ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `world`
+  --> src\api\instance\logic.rs:11:5
+   |
+11 |     world,
+   |     ^^^^^
+
+warning: unused import: `definitions::CreateInstanceRequest`
+ --> src\api\instance\mod.rs:4:9
+  |
+4 | pub use definitions::CreateInstanceRequest;
+  |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Serialize`
+ --> src\api\invite\definitions.rs:1:26
+  |
+1 | use serde::{Deserialize, Serialize};
+  |                          ^^^^^^^^^
+
+warning: unused import: `definitions::NotificationType`
+ --> src\api\invite\mod.rs:4:9
+  |
+4 | pub use definitions::NotificationType;
+  |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `definitions::SelfInviteResponse`
+ --> src\api\invite\mod.rs:5:9
+  |
+5 | pub use definitions::SelfInviteResponse;
+  |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::fmt::Display`
+ --> src\api\world\definitions.rs:7:5
+  |
+7 | use std::fmt::Display;
+  |     ^^^^^^^^^^^^^^^^^
+
+warning: unused import: `serde::Deserialize`
+ --> src\api\world\logic.rs:5:5
+  |
+5 | use serde::Deserialize;
+  |     ^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `definitions::FavoriteWorld`
+ --> src\api\world\mod.rs:4:9
+  |
+4 | pub use definitions::FavoriteWorld;
+  |         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `FOLDERS` and `WORLDS`
+ --> src\commands\data\read_data_commands.rs:4:13
+  |
+4 | use crate::{FOLDERS, PREFERENCES, WORLDS};
+  |             ^^^^^^^               ^^^^^^
+
+warning: unused import: `crate::definitions::CardSize`
+ --> src\commands\data\write_data_commands.rs:2:5
+  |
+2 | use crate::definitions::CardSize;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `CustomPreferences`
+  --> src\definitions\mod.rs:11:35
+   |
+11 | pub use custom_data::{CustomData, CustomPreferences};
+   |                                   ^^^^^^^^^^^^^^^^^
+
+warning: unused import: `VRChatWorld`
+ --> src\services\api_service.rs:2:42
+  |
+2 | use crate::api::world::{SearchWorldSort, VRChatWorld, WorldSearchParametersBuilder};
+  |                                          ^^^^^^^^^^^
+
+warning: unused import: `crate::services::api_service::world::WorldSearchParameters`
+ --> src\services\api_service.rs:5:5
+  |
+5 | use crate::services::api_service::world::WorldSearchParameters;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::services::FolderManager`
+ --> src\services\api_service.rs:7:5
+  |
+7 | use crate::services::FolderManager;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Client`
+  --> src\services\api_service.rs:11:28
+   |
+11 | use reqwest::{cookie::Jar, Client, Url};
+   |                            ^^^^^^
+
+warning: unused import: `RwLock`
+  --> src\services\api_service.rs:12:22
+   |
+12 | use std::sync::{Arc, RwLock};
+   |                      ^^^^^^
+
+warning: unused import: `std::fs`
+ --> src\services\encryption_service.rs:7:5
+  |
+7 | use std::fs;
+  |     ^^^^^^^
+
+warning: unused import: `log::debug`
+ --> src\services\file_service.rs:6:5
+  |
+6 | use log::debug;
+  |     ^^^^^^^^^^
+
+warning: unused import: `std::ffi::OsString`
+ --> src\services\file_service.rs:8:5
+  |
+8 | use std::ffi::OsString;
+  |     ^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `HashSet`
+ --> src\services\folder_manager.rs:8:33
+  |
+8 | use std::collections::{HashMap, HashSet};
+  |                                 ^^^^^^^
+
+warning: unused import: `std::env`
+ --> src\services\share_service.rs:8:5
+  |
+8 | use std::env;
+  |     ^^^^^^^^
+
+warning: unused imports: `initialize_app` and `set_preferences`
+  --> src\services\mod.rs:18:30
+   |
+18 | pub use initialize_service::{initialize_app, set_preferences};
+   |                              ^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^
+
+warning: unused imports: `download_folder` and `share_folder`
+  --> src\services\mod.rs:19:25
+   |
+19 | pub use share_service::{download_folder, share_folder};
+   |                         ^^^^^^^^^^^^^^^  ^^^^^^^^^^^^
+
+warning: unnecessary parentheses around function argument
+   --> src\lib.rs:153:17
+    |
+153 |                 (get_update_handler(
+    |                 ^
+...
+160 |                 )),
+    |                  ^
+    |
+    = note: `#[warn(unused_parens)]` (part of `#[warn(unused)]`) on by default
+help: remove these parentheses
+    |
+153 ~                 get_update_handler(
+154 |                     app.handle().clone(),
+...
+159 |                         .update_channel,
+160 ~                 ) ,
+    |
+
+warning: use of deprecated function `rand::thread_rng`: Renamed to `rng`
+   --> src\api\common.rs:128:24
+    |
+128 |     let jitter = rand::thread_rng().gen_range(0..=half_backoff);
+    |                        ^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+
+warning: variable does not need to be mutable
+   --> src\migration\logic.rs:373:13
+    |
+373 |         let mut old_worlds = Self::parse_world_data(&worlds_content)
+    |             ----^^^^^^^^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: use of deprecated method `rand::Rng::gen_range`: Renamed to `random_range`
+   --> src\api\common.rs:128:37
+    |
+128 |     let jitter = rand::thread_rng().gen_range(0..=half_backoff);
+    |                                     ^^^^^^^^^
+
+warning: unused variable: `user`
+   --> src\services\api_service.rs:185:57
+    |
+185 |             Ok(auth::VRChatAuthStatus::Success(cookies, user)) => {
+    |                                                         ^^^^ help: if this is intentional, prefix it with an underscore: `_user`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `user_id`
+   --> src\services\api_service.rs:298:9
+    |
+298 |         user_id: String,
+    |         ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_user_id`
+
+warning: unused variable: `app`
+   --> src\services\api_service.rs:550:9
+    |
+550 |         app: AppHandle,
+    |         ^^^ help: if this is intentional, prefix it with an underscore: `_app`
+
+warning: unused variable: `app`
+   --> src\services\api_service.rs:695:9
+    |
+695 |         app: AppHandle,
+    |         ^^^ help: if this is intentional, prefix it with an underscore: `_app`
+
+warning: unused variable: `first_idx`
+   --> src\migration\logic.rs:207:29
+    |
+207 |             if let Some((_, first_idx)) = unique_worlds.get(&world.world_id) {
+    |                             ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_first_idx`
+
+warning: unused variable: `folders_lock`
+  --> src\services\export_service.rs:73:13
+   |
+73 |         let folders_lock = folders.read().map_err(|e| {
+   |             ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_folders_lock`
+
+warning: associated functions `public`, `group_public`, `group_plus`, and `group_only` are never used
+  --> src\api\instance\definitions.rs:17:12
+   |
+16 | impl InstanceType {
+   | ----------------- associated functions in this implementation
+17 |     pub fn public() -> Self {
+   |            ^^^^^^
+...
+32 |     pub fn group_public<S: AsRef<str>>(group_id: S) -> Self {
+   |            ^^^^^^^^^^^^
+...
+35 |     pub fn group_plus<S: AsRef<str>>(group_id: S) -> Self {
+   |            ^^^^^^^^^^
+...
+38 |     pub fn group_only<S: AsRef<str>>(group_id: S, allowed_roles: Option<Vec<String>>) -> Self {
+   |            ^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `id`, `owner_id`, `photon_region`, `region`, and `short_name` are never read
+   --> src\api\instance\definitions.rs:173:9
+    |
+171 | pub struct Instance {
+    |            -------- fields in this struct
+172 |     #[serde(rename = "id")]
+173 |     pub id: String,
+    |         ^^
+...
+178 |     pub owner_id: Option<String>,
+    |         ^^^^^^^^
+179 |     #[serde(rename = "photonRegion")]
+180 |     pub photon_region: InstanceRegion,
+    |         ^^^^^^^^^^^^^
+181 |     #[serde(rename = "region")]
+182 |     pub region: InstanceRegion,
+    |         ^^^^^^
+183 |     #[serde(rename = "shortName")]
+184 |     pub short_name: Option<String>,
+    |         ^^^^^^^^^^
+    |
+    = note: `Instance` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: multiple fields are never read
+  --> src\api\invite\definitions.rs:5:9
+   |
+ 4 | pub struct SelfInviteResponse {
+   |            ------------------ fields in this struct
+ 5 |     pub created_at: String,
+   |         ^^^^^^^^^^
+ 6 |     pub details: serde_json::Value,
+   |         ^^^^^^^
+ 7 |     pub id: String,
+   |         ^^
+ 8 |     pub message: String,
+   |         ^^^^^^^
+ 9 |     #[serde(rename = "receiverUserId")]
+10 |     pub receiver_user_id: String,
+   |         ^^^^^^^^^^^^^^^^
+11 |     #[serde(rename = "senderUserId")]
+12 |     pub sender_user_id: String,
+   |         ^^^^^^^^^^^^^^
+13 |     #[serde(rename = "type")]
+14 |     pub notification_type: NotificationType,
+   |         ^^^^^^^^^^^^^^^^^
+   |
+   = note: `SelfInviteResponse` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: methods `sort`, `tag`, `notag`, `platform`, and `search` are never used
+   --> src\api\world\definitions.rs:379:12
+    |
+368 | impl WorldSearchParametersBuilder {
+    | --------------------------------- methods in this implementation
+...
+379 |     pub fn sort(mut self, sort: SearchWorldSort) -> Self {
+    |            ^^^^
+...
+384 |     pub fn tag<S: AsRef<str>>(mut self, tag: S) -> Self {
+    |            ^^^
+...
+389 |     pub fn notag<S: AsRef<str>>(mut self, tag: S) -> Self {
+    |            ^^^^^
+...
+394 |     pub fn platform<S: AsRef<str>>(mut self, platform: S) -> Self {
+    |            ^^^^^^^^
+...
+399 |     pub fn search<S: AsRef<str>>(mut self, search: S) -> Self {
+    |            ^^^^^^
+
+warning: multiple variants are never constructed
+   --> src\api\world\definitions.rs:422:5
+    |
+416 | pub enum SearchWorldSort {
+    |          --------------- variants in this enum
+...
+422 |     Trust,
+    |     ^^^^^
+423 |     #[serde(rename = "shuffle")]
+424 |     Shuffle,
+    |     ^^^^^^^
+...
+430 |     ReportScore,
+    |     ^^^^^^^^^^^
+431 |     #[serde(rename = "reportCount")]
+432 |     ReportCount,
+    |     ^^^^^^^^^^^
+...
+436 |     LabsPublicationDate,
+    |     ^^^^^^^^^^^^^^^^^^^
+...
+440 |     CreatedAt,
+    |     ^^^^^^^^^
+...
+444 |     UpdatedAt,
+    |     ^^^^^^^^^
+445 |     #[serde(rename = "order")]
+446 |     Order,
+    |     ^^^^^
+...
+450 |     Magic,
+    |     ^^^^^
+451 |     #[serde(rename = "name")]
+452 |     Name,
+    |     ^^^^
+    |
+    = note: `SearchWorldSort` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: methods `rename_folder` and `remove_folder` are never used
+  --> src\definitions\custom_data.rs:81:12
+   |
+39 | impl CustomData {
+   | --------------- methods in this implementation
+...
+81 |     pub fn rename_folder(&mut self, old_name: &str, new_name: &str) {
+   |            ^^^^^^^^^^^^^
+...
+88 |     pub fn remove_folder(&mut self, folder_name: &str) {
+   |            ^^^^^^^^^^^^^
+
+warning: variant `DecryptionError` is never constructed
+  --> src\errors.rs:22:5
+   |
+16 | pub enum FileError {
+   |          --------- variant in this enum
+...
+22 |     DecryptionError,
+   |     ^^^^^^^^^^^^^^^
+   |
+   = note: `FileError` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: variants `Inconsistent`, `InvalidOperation`, and `InitializationFailed` are never constructed
+  --> src\errors.rs:38:5
+   |
+36 | pub enum StateError {
+   |          ---------- variants in this enum
+37 |     /// Internal state is inconsistent or corrupted
+38 |     Inconsistent(&'static str),
+   |     ^^^^^^^^^^^^
+39 |     /// Operation would result in invalid state
+40 |     InvalidOperation(&'static str),
+   |     ^^^^^^^^^^^^^^^^
+41 |     /// Required state initialization failed
+42 |     InitializationFailed,
+   |     ^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `StateError` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: variants `Timeout`, `ConnectionFailed`, `HttpError`, and `InvalidResponse` are never constructed
+  --> src\errors.rs:48:5
+   |
+46 | pub enum NetworkError {
+   |          ------------ variants in this enum
+47 |     /// Connection timed out
+48 |     Timeout,
+   |     ^^^^^^^
+49 |     /// Failed to establish connection
+50 |     ConnectionFailed,
+   |     ^^^^^^^^^^^^^^^^
+51 |     /// Request failed with HTTP error
+52 |     HttpError(u16),
+   |     ^^^^^^^^^
+53 |     /// Response parsing failed
+54 |     InvalidResponse,
+   |     ^^^^^^^^^^^^^^^
+   |
+   = note: `NetworkError` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: variants `AuthenticationFailed`, `RateLimitExceeded`, `InvalidRequest`, `ResponseError`, and `VersionMismatch` are never constructed
+  --> src\errors.rs:60:5
+   |
+58 | pub enum ApiError {
+   |          -------- variants in this enum
+59 |     /// API authentication failed
+60 |     AuthenticationFailed,
+   |     ^^^^^^^^^^^^^^^^^^^^
+61 |     /// API rate limit exceeded
+62 |     RateLimitExceeded,
+   |     ^^^^^^^^^^^^^^^^^
+63 |     /// Invalid API request parameters
+64 |     InvalidRequest(&'static str),
+   |     ^^^^^^^^^^^^^^
+65 |     /// API returned error response
+66 |     ResponseError(String),
+   |     ^^^^^^^^^^^^^
+67 |     /// API version mismatch
+68 |     VersionMismatch,
+   |     ^^^^^^^^^^^^^^^
+   |
+   = note: `ApiError` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: variants `DuplicateFolder`, `DuplicateWorld`, and `InvalidOperation` are never constructed
+  --> src\errors.rs:78:5
+   |
+72 | pub enum EntityError {
+   |          ----------- variants in this enum
+...
+78 |     DuplicateFolder(String),
+   |     ^^^^^^^^^^^^^^^
+79 |     /// Duplicate world in folder
+80 |     DuplicateWorld(String),
+   |     ^^^^^^^^^^^^^^
+81 |     /// Invalid operation
+82 |     InvalidOperation(String),
+   |     ^^^^^^^^^^^^^^^^
+   |
+   = note: `EntityError` has derived impls for the traits `Clone` and `Debug`, but these are intentionally ignored during dead code analysis
+
+warning: enum `ServiceErrors` is never used
+  --> src\errors.rs:87:10
+   |
+87 | pub enum ServiceErrors {
+   |          ^^^^^^^^^^^^^
+
+warning: struct `Logger` is never constructed
+  --> src\logging\definitions.rs:21:12
+   |
+21 | pub struct Logger {
+   |            ^^^^^^
+
+warning: enum `LogLevel` is never used
+  --> src\logging\definitions.rs:59:10
+   |
+59 | pub enum LogLevel {
+   |          ^^^^^^^^
+
+warning: struct `LogEntry` is never constructed
+  --> src\logging\definitions.rs:92:12
+   |
+92 | pub struct LogEntry {
+   |            ^^^^^^^^
+
+warning: associated function `new` is never used
+   --> src\logging\definitions.rs:101:12
+    |
+100 | impl LogEntry {
+    | ------------- associated function in this implementation
+101 |     pub fn new(record: &Record) -> Self {
+    |            ^^^
+
+warning: function `to_rfc3339_micros` is never used
+   --> src\logging\definitions.rs:125:4
+    |
+125 | fn to_rfc3339_micros<S>(
+    |    ^^^^^^^^^^^^^^^^^
+
+warning: enum `LogChannelMessage` is never used
+   --> src\logging\definitions.rs:136:10
+    |
+136 | pub enum LogChannelMessage {
+    |          ^^^^^^^^^^^^^^^^^
+
+warning: static `LOG_BUFFER` is never used
+  --> src\logging\worker.rs:22:8
+   |
+22 | static LOG_BUFFER: Mutex<ConstGenericRingBuffer<LogEntry, 256>> =
+   |        ^^^^^^^^^^
+
+warning: function `get_logs` is never used
+  --> src\logging\worker.rs:25:8
+   |
+25 | pub fn get_logs() -> Vec<LogEntry> {
+   |        ^^^^^^^^
+
+warning: function `set_preferences` is never used
+  --> src\services\initialize_service.rs:56:8
+   |
+56 | pub fn set_preferences(
+   |        ^^^^^^^^^^^^^^^
+
+warning: `vrc-worlds-manager` (lib) generated 63 warnings (run `cargo fix --lib -p vrc-worlds-manager` to apply 40 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.63s

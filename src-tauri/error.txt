@@ -1,0 +1,366 @@
+﻿cargo : warning: vrc-worlds-manager@1.3.0-rc.0:
+ Found .env file, loading environment variables
+ for development
+発生場所 行:1 文字:1
++ cargo check 2>&1 | Out-File -FilePath error.t
+xt -Encoding utf8
++ ~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (w 
+   arning: vrc-wo...for development:String) [  
+  ], RemoteException
+    + FullyQualifiedErrorId : NativeCommandErr 
+   or
+ 
+    Checking vrc-worlds-manager v1.3.0-rc.0 (D:
+\download\VRC-Worlds-Manager-v2-vrc-world-manag
+er-v1.3.0-rc.0\src-tauri)
+error[E0432]: unresolved import `crate::definit
+ions::DefaultInstanceType`
+   --> src\commands\preferences_commands.rs:3:5
+    |
+  3 | use crate::definitions::DefaultInstanceTy
+pe;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^ no `DefaultInstanceType` in `definitions`
+    |
+note: enum `crate::definitions::entities::Defau
+ltInstanceType` exists but is inaccessible
+   --> src\definitions\entities.rs:277:1
+    |
+277 | pub enum DefaultInstanceType {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not accessib
+le
+
+warning: unused import: `tauri_plugin_updater::
+UpdaterExt`
+  --> src\lib.rs:11:5
+   |
+11 | use tauri_plugin_updater::UpdaterExt;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `
+#[warn(unused)]`) on by default
+
+warning: unused imports: `AppHandle` and `Manag
+er`
+ --> src\api\common.rs:4:13
+  |
+4 | use tauri::{AppHandle, Manager};
+  |             ^^^^^^^^^  ^^^^^^^
+
+warning: unused imports: `Duration` and `sleep`
+ --> src\api\common.rs:5:19
+  |
+5 | use tokio::time::{sleep, Duration};
+  |                   ^^^^^  ^^^^^^^^
+
+warning: unused import: `crate::api::RateLimitS
+tore`
+ --> src\api\common.rs:7:5
+  |
+7 | use crate::api::RateLimitStore;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `definitions::VRChatAut
+hPhase`
+ --> src\api\auth\mod.rs:4:9
+  |
+4 | pub use definitions::VRChatAuthPhase;
+  |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `definitions::GroupInst
+anceCreateAllowedType`
+ --> src\api\group\mod.rs:4:9
+  |
+4 | pub use definitions::GroupInstanceCreateAll
+owedType;
+  |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^
+
+warning: unused import: `definitions::GroupInst
+anceCreatePermission`
+ --> src\api\group\mod.rs:5:9
+  |
+5 | pub use definitions::GroupInstanceCreatePer
+mission;
+  |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^
+
+warning: unused import: `definitions::GroupMemb
+erVisibility`
+ --> src\api\group\mod.rs:7:9
+  |
+7 | pub use definitions::GroupMemberVisibility;
+  |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `definitions::GroupRole
+`
+ --> src\api\group\mod.rs:8:9
+  |
+8 | pub use definitions::GroupRole;
+  |         ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `world`
+  --> src\api\instance\logic.rs:11:5
+   |
+11 |     world,
+   |     ^^^^^
+
+warning: unused import: `definitions::CreateIns
+tanceRequest`
+ --> src\api\instance\mod.rs:4:9
+  |
+4 | pub use definitions::CreateInstanceRequest;
+  |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Serialize`
+ --> src\api\invite\definitions.rs:1:26
+  |
+1 | use serde::{Deserialize, Serialize};
+  |                          ^^^^^^^^^
+
+warning: unused import: `definitions::Notificat
+ionType`
+ --> src\api\invite\mod.rs:4:9
+  |
+4 | pub use definitions::NotificationType;
+  |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `definitions::SelfInvit
+eResponse`
+ --> src\api\invite\mod.rs:5:9
+  |
+5 | pub use definitions::SelfInviteResponse;
+  |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::fmt::Display`
+ --> src\api\world\definitions.rs:7:5
+  |
+7 | use std::fmt::Display;
+  |     ^^^^^^^^^^^^^^^^^
+
+warning: unused import: `serde::Deserialize`
+ --> src\api\world\logic.rs:5:5
+  |
+5 | use serde::Deserialize;
+  |     ^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `definitions::FavoriteW
+orld`
+ --> src\api\world\mod.rs:4:9
+  |
+4 | pub use definitions::FavoriteWorld;
+  |         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `FOLDERS` and `WORLDS`
+ --> src\commands\data\read_data_commands.rs:4:
+13
+  |
+4 | use crate::{FOLDERS, PREFERENCES, WORLDS};
+  |             ^^^^^^^               ^^^^^^
+
+warning: unused import: `crate::definitions::Ca
+rdSize`
+ --> src\commands\data\write_data_commands.rs:2
+:5
+  |
+2 | use crate::definitions::CardSize;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `VRChatWorld`
+ --> src\services\api_service.rs:2:42
+  |
+2 | use crate::api::world::{SearchWorldSort, VR
+ChatWorld, WorldSearchParametersBuilder};
+  |                                          ^^
+^^^^^^^^^
+
+warning: unused import: `crate::services::api_s
+ervice::world::WorldSearchParameters`
+ --> src\services\api_service.rs:5:5
+  |
+5 | use crate::services::api_service::world::Wo
+rldSearchParameters;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::services::Folde
+rManager`
+ --> src\services\api_service.rs:7:5
+  |
+7 | use crate::services::FolderManager;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Client`
+  --> src\services\api_service.rs:11:28
+   |
+11 | use reqwest::{cookie::Jar, Client, Url};
+   |                            ^^^^^^
+
+warning: unused import: `RwLock`
+  --> src\services\api_service.rs:12:22
+   |
+12 | use std::sync::{Arc, RwLock};
+   |                      ^^^^^^
+
+warning: unused import: `std::fs`
+ --> src\services\encryption_service.rs:7:5
+  |
+7 | use std::fs;
+  |     ^^^^^^^
+
+warning: unused import: `log::debug`
+ --> src\services\file_service.rs:6:5
+  |
+6 | use log::debug;
+  |     ^^^^^^^^^^
+
+warning: unused import: `std::ffi::OsString`
+ --> src\services\file_service.rs:8:5
+  |
+8 | use std::ffi::OsString;
+  |     ^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `HashSet`
+ --> src\services\folder_manager.rs:8:33
+  |
+8 | use std::collections::{HashMap, HashSet};
+  |                                 ^^^^^^^
+
+warning: unused import: `std::env`
+ --> src\services\share_service.rs:8:5
+  |
+8 | use std::env;
+  |     ^^^^^^^^
+
+warning: unused imports: `initialize_app` and `
+set_preferences`
+  --> src\services\mod.rs:18:30
+   |
+18 | pub use initialize_service::{initialize_ap
+p, set_preferences};
+   |                              ^^^^^^^^^^^^^
+^  ^^^^^^^^^^^^^^^
+
+warning: unused imports: `download_folder` and 
+`share_folder`
+  --> src\services\mod.rs:19:25
+   |
+19 | pub use share_service::{download_folder, s
+hare_folder};
+   |                         ^^^^^^^^^^^^^^^  ^
+^^^^^^^^^^^
+
+warning: unnecessary parentheses around functio
+n argument
+   --> src\lib.rs:152:17
+    |
+152 |                 (get_update_handler(
+    |                 ^
+...
+159 |                 )),
+    |                  ^
+    |
+    = note: `#[warn(unused_parens)]` (part of `
+#[warn(unused)]`) on by default
+help: remove these parentheses
+    |
+152 ~                 get_update_handler(
+153 |                     app.handle().clone(),
+...
+158 |                         .update_channel,
+159 ~                 ) ,
+    |
+
+warning: use of deprecated function `rand::thre
+ad_rng`: Renamed to `rng`
+   --> src\api\common.rs:128:24
+    |
+128 |     let jitter = rand::thread_rng().gen_r
+ange(0..=half_backoff);
+    |                        ^^^^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+
+warning: variable does not need to be mutable
+   --> src\migration\logic.rs:372:13
+    |
+372 |         let mut old_worlds = Self::parse_
+world_data(&worlds_content)
+    |             ----^^^^^^^^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[w
+arn(unused)]`) on by default
+
+warning: use of deprecated method `rand::Rng::g
+en_range`: Renamed to `random_range`
+   --> src\api\common.rs:128:37
+    |
+128 |     let jitter = rand::thread_rng().gen_r
+ange(0..=half_backoff);
+    |                                     ^^^^^
+^^^^
+
+warning: unused variable: `user`
+   --> src\services\api_service.rs:185:57
+    |
+185 |             Ok(auth::VRChatAuthStatus::Su
+ccess(cookies, user)) => {
+    |                                          
+               ^^^^ help: if this is intentiona
+l, prefix it with an underscore: `_user`
+    |
+    = note: `#[warn(unused_variables)]` (part o
+f `#[warn(unused)]`) on by default
+
+warning: unused variable: `user_id`
+   --> src\services\api_service.rs:298:9
+    |
+298 |         user_id: String,
+    |         ^^^^^^^ help: if this is intentio
+nal, prefix it with an underscore: `_user_id`
+
+warning: unused variable: `app`
+   --> src\services\api_service.rs:550:9
+    |
+550 |         app: AppHandle,
+    |         ^^^ help: if this is intentional,
+ prefix it with an underscore: `_app`
+
+warning: unused variable: `app`
+   --> src\services\api_service.rs:695:9
+    |
+695 |         app: AppHandle,
+    |         ^^^ help: if this is intentional,
+ prefix it with an underscore: `_app`
+
+warning: unused variable: `first_idx`
+   --> src\migration\logic.rs:206:29
+    |
+206 |             if let Some((_, first_idx)) =
+ unique_worlds.get(&world.world_id) {
+    |                             ^^^^^^^^^ hel
+p: if this is intentional, prefix it with an un
+derscore: `_first_idx`
+
+warning: unused variable: `folders_lock`
+  --> src\services\export_service.rs:73:13
+   |
+73 |         let folders_lock = folders.read().
+map_err(|e| {
+   |             ^^^^^^^^^^^^ help: if this is 
+intentional, prefix it with an underscore: `_fo
+lders_lock`
+
+For more information about this error, try `rus
+tc --explain E0432`.
+warning: `vrc-worlds-manager` (lib) generated 4
+1 warnings
+warning: vrc-worlds-manager@1.3.0-rc.0: Found .
+env file, loading environment variables for dev
+elopment
+error: could not compile `vrc-worlds-manager` (
+lib) due to 1 previous error; 41 warnings emitt
+ed

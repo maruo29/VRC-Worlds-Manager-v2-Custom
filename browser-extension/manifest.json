@@ -1,0 +1,27 @@
+{
+    "manifest_version": 3,
+    "name": "VRC Worlds Manager Helper",
+    "version": "1.0",
+    "description": "Open VRChat world links directly in VRC Worlds Manager",
+    "permissions": [
+        "contextMenus",
+        "tabs",
+        "scripting"
+    ],
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://vrchat.com/*"
+            ],
+            "js": [
+                "content.js"
+            ]
+        }
+    ]
+}
