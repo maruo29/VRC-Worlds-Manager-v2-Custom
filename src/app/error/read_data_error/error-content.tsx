@@ -139,17 +139,7 @@ export function ErrorContent() {
             </Button>
           </div>
 
-          <Button variant="secondary" className="gap-2 w-full" asChild>
-            <a
-              href="https://discord.gg/gNzbpux5xW"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center"
-            >
-              <SiDiscord className="h-4 w-4" />
-              <span>{t('error-page:contact-support')}</span>
-            </a>
-          </Button>
+
 
           <Button
             onClick={() => window.location.reload()}
