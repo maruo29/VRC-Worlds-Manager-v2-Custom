@@ -5,6 +5,9 @@ on:
       - main
       - pre-release
 
+permissions:
+  contents: write
+
 jobs:
   build-and-release-for-stable:
     if: github.ref == 'refs/heads/main'
