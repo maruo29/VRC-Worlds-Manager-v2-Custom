@@ -235,7 +235,7 @@ export default function AboutSection() {
           <div className="flex gap-4">
             <Button variant="ghost" size="sm" asChild>
               <a
-                href="https://github.com/Raifa21/vrc-worlds-manager-v2"
+                href="https://github.com/maruo29/VRC-Worlds-Manager-v2-Custom"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex flex-row gap-2"
