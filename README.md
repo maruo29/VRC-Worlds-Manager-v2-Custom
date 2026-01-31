@@ -75,6 +75,22 @@ VRC Worlds Manager is a Windows application designed to help VRChat users organi
 ![image](https://github.com/user-attachments/assets/d45f8363-b5d7-4a3b-8a94-d4cd39fdb372)
 
 
+
+---
+
+## Chrome Extension
+
+This project includes a Chrome extension for enhanced integration.
+
+### Features
+- **Context Menu Search**: Search for selected text in VRC Worlds Manager directly from the browser context menu.
+- **Deep Link Support**: Handles deep links for better VRChat integration.
+
+### Installation
+1. Go to `chrome://extensions/` in Chrome.
+2. Enable "Developer mode" in the top right.
+3. Click "Load unpacked" and select the `browser-extension` folder in this repository.
+
 ---
 
 ## Installation

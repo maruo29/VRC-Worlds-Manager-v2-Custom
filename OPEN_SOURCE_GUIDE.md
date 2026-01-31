@@ -60,6 +60,7 @@ git push -u origin main
    - 特に「本家からの変更点」や「新機能」を強調すると良いでしょう。
 5. **Attach binaries by dropping them here...** のエリアに、ビルドしたインストーラをドラッグ＆ドロップします。
    - ファイルパス: `src-tauri/target/release/bundle/nsis/vrc-worlds-manager_1.3.0-2_x64-setup.exe`
+   - **Chrome拡張機能**: `browser-extension` フォルダをZip圧縮し、`chrome-extension-v1.3.0-2.zip` などの名前で添付すると、ユーザーが使いやすくなります。
 6. 「Publish release」をクリックします。
 
 これで公開完了です！
