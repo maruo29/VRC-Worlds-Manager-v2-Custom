@@ -327,24 +327,44 @@ impl FileService {
         let (config_path, folders_path, worlds_path, cookies_path) = Self::get_paths();
 
         log::info!("Reading files");
-        let preferences: PreferenceModel = Self::read_file(&config_path)?;
+        log::info!("Reading files");
+        
+        let preferences: PreferenceModel = match Self::read_file(&config_path) {
+            Ok(data) => data,
+            Err(e) => {
+                log::warn!("preferences.json is invalid or missing ({}), resetting to defaults...", e);
+                // Can't write here easily without ignoring result, but we return default
+                PreferenceModel::new()
+            }
+        };
+
         let folders: Vec<FolderModel> = match Self::read_file(&folders_path) {
             Ok(data) => data,
             Err(_) => {
                 log::warn!("folders.json is invalid, recreating...");
-                Self::create_empty_folders_file()?;
-                Self::read_file(&folders_path)?
+                Self::create_empty_folders_file().ok(); // Ignore write error
+                // Return empty if read fails again or just empty vec
+                Vec::new()
             }
         };
+        
         let mut worlds: Vec<WorldModel> = match Self::read_file(&worlds_path) {
             Ok(data) => data,
             Err(_) => {
                 log::warn!("worlds.json is invalid, recreating...");
-                Self::create_empty_worlds_file()?;
-                Self::read_file(&worlds_path)?
+                Self::create_empty_worlds_file().ok();
+                Vec::new()
             }
         };
-        let cookies = Self::read_auth_file(&cookies_path)?;
+        
+        let cookies = match Self::read_auth_file(&cookies_path) {
+            Ok(data) => data,
+            Err(e) => {
+                log::warn!("auth.json is invalid or missing ({}), resetting...", e);
+                Self::create_empty_auth_file().ok();
+                AuthCookies::new()
+            }
+        };
 
         // populate per-world folder list
         for world in worlds.iter_mut() {
