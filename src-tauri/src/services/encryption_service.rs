@@ -12,13 +12,18 @@ const ENCRYPTION_KEY: Option<&str> = option_env!("ENCRYPTION_KEY");
 const ENCRYPTION_IV: Option<&str> = option_env!("ENCRYPTION_IV");
 
 impl EncryptionService {
-    fn get_encryption_keys() -> Result<(Vec<u8>, Vec<u8>), String> {
-        let key_str = ENCRYPTION_KEY.unwrap_or("MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDE=");
-        let iv_str = ENCRYPTION_IV.unwrap_or("MDEyMzQ1Njc4OTAxMjM0NQ==");
+    pub fn are_keys_set() -> bool {
+        ENCRYPTION_KEY.is_some() && ENCRYPTION_IV.is_some()
+    }
 
-        if ENCRYPTION_KEY.is_none() {
-            log::warn!("ENCRYPTION_KEY not set, using default key for local development");
-        }
+    fn get_encryption_keys() -> Result<(Vec<u8>, Vec<u8>), String> {
+        let key_str = ENCRYPTION_KEY.ok_or_else(|| {
+            "ENCRYPTION_KEY environment variable not set at compile time".to_string()
+        })?;
+
+        let iv_str = ENCRYPTION_IV.ok_or_else(|| {
+            "ENCRYPTION_IV environment variable not set at compile time".to_string()
+        })?;
 
         // Convert from base64 to bytes for AES
         let key = STANDARD

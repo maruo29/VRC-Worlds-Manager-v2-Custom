@@ -278,27 +278,27 @@ impl FileService {
 
         match serde_json::from_str::<AuthCookies>(&content) {
             Ok(mut cookies) => {
-                if let Some(auth) = &cookies.auth_token {
-                    if !auth.is_empty() {
-                        cookies.auth_token =
-                            Some(EncryptionService::decrypt_aes(auth).map_err(|e| {
-                                log::error!("Failed to decrypt auth token: {}", e);
-                                FileError::InvalidFile
-                            })?);
+                if cookies.version == 1 {
+                    if let Some(auth) = &cookies.auth_token {
+                        if !auth.is_empty() {
+                            cookies.auth_token =
+                                Some(EncryptionService::decrypt_aes(auth).map_err(|e| {
+                                    log::error!("Failed to decrypt auth token: {}", e);
+                                    FileError::InvalidFile
+                                })?);
+                        }
+                    }
+                    if let Some(tfa) = &cookies.two_factor_auth {
+                        if !tfa.is_empty() {
+                            cookies.two_factor_auth =
+                                Some(EncryptionService::decrypt_aes(tfa).map_err(|e| {
+                                    log::error!("Failed to decrypt two-factor auth token: {}", e);
+                                    FileError::InvalidFile
+                                })?);
+                        }
                     }
                 } else {
-                    cookies.auth_token = None;
-                }
-                if let Some(tfa) = &cookies.two_factor_auth {
-                    if !tfa.is_empty() {
-                        cookies.two_factor_auth =
-                            Some(EncryptionService::decrypt_aes(tfa).map_err(|e| {
-                                log::error!("Failed to decrypt two-factor auth token: {}", e);
-                                FileError::InvalidFile
-                            })?);
-                    }
-                } else {
-                    cookies.two_factor_auth = None;
+                    log::info!("Auth file has version {}, skipping decryption.", cookies.version);
                 }
                 Ok(cookies)
             }
@@ -494,26 +494,33 @@ impl FileService {
         let (_, _, _, auth_path) = Self::get_paths();
         let mut encrypted_cookies = cookies.clone();
 
-        // Ensure tokens are encrypted when writing
-        if let Some(auth) = &cookies.auth_token {
-            encrypted_cookies.auth_token = match EncryptionService::encrypt_aes(auth) {
-                Ok(encrypted) => Some(encrypted),
-                Err(e) => {
-                    log::error!("Failed to encrypt auth token: {}", e);
-                    None
-                }
-            };
+        if EncryptionService::are_keys_set() {
+            // Encrypt if keys are available (Production / Secrets set)
+            if let Some(auth) = &cookies.auth_token {
+                encrypted_cookies.auth_token = match EncryptionService::encrypt_aes(auth) {
+                    Ok(encrypted) => Some(encrypted),
+                    Err(e) => {
+                        log::error!("Failed to encrypt auth token: {}", e);
+                        None
+                    }
+                };
+            }
+            if let Some(tfa) = &cookies.two_factor_auth {
+                encrypted_cookies.two_factor_auth = match EncryptionService::encrypt_aes(tfa) {
+                    Ok(encrypted) => Some(encrypted),
+                    Err(e) => {
+                        log::error!("Failed to encrypt two-factor auth token: {}", e);
+                        None
+                    }
+                };
+            }
+            encrypted_cookies.version = 1;
+        } else {
+            // Plaintext storage for local development
+            log::warn!("Encryption keys not set. Saving auth tokens in PLAINTEXT.");
+            encrypted_cookies.version = 0;
+            // No encryption, just keep original values
         }
-        if let Some(tfa) = &cookies.two_factor_auth {
-            encrypted_cookies.two_factor_auth = match EncryptionService::encrypt_aes(tfa) {
-                Ok(encrypted) => Some(encrypted),
-                Err(e) => {
-                    log::error!("Failed to encrypt two-factor auth token: {}", e);
-                    None
-                }
-            };
-        }
-        encrypted_cookies.version = 1;
 
         let data =
             serde_json::to_string_pretty(&encrypted_cookies).map_err(|_| FileError::InvalidFile)?;
