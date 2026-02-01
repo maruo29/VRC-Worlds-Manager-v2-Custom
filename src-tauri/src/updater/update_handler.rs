@@ -50,107 +50,22 @@ impl UpdateHandler {
 
     pub async fn check_for_update(
         &mut self,
-        channel: &UpdateChannel,
+        _channel: &UpdateChannel,
     ) -> tauri_plugin_updater::Result<bool> {
-        let url = format!(
-            "https://releases.raifaworks.com/manifests/{}.json",
-            channel.as_str()
-        );
-
-        log::info!("checking for update from {}", url);
-
-        let result = self
-            .app_handle
-            .updater_builder()
-            .endpoints(vec![Url::parse(&url).unwrap()])?
-            .build()?
-            .check()
-            .await?;
-
-        if result.is_none() {
-            self.update_available = false;
-            self.update_version = None;
-
-            self.initialized = true;
-            return Ok(false);
-        }
-
-        let update = result.unwrap();
-
-        if let Some(legacy_update_handler) = &self.update_handler {
-            // If signature is different, we need to download the update again
-            if legacy_update_handler.signature != update.signature {
-                self.downloaded_update_data = None;
-                self.changelog = None;
-            }
-        }
-
-        self.update_handler = Some(update.clone());
-        self.update_available = true;
-        self.update_version = Some(update.version);
+        // Auto-update disabled
+        self.update_available = false;
+        self.update_version = None;
         self.initialized = true;
-        return Ok(true);
+        Ok(false)
     }
 
     pub async fn download_update(&mut self) -> tauri_plugin_updater::Result<()> {
-        if self.downloaded_update_data.is_some() {
-            log::info!("Update already downloaded, skipping download.");
-            return Ok(());
-        }
-
-        if let Some(update) = &self.update_handler {
-            let mut downloaded = 0;
-
-            log::info!("Downloading update...");
-
-            let downloaded_data = update
-                .download(
-                    |chunk_length, content_length| {
-                        downloaded += chunk_length;
-
-                        let progress = if let Some(len) = content_length {
-                            downloaded as f32 / len as f32
-                        } else {
-                            0f32
-                        };
-
-                        log::debug!("Downloaded {downloaded} bytes ({:.1}%)", progress * 100.0);
-
-                        if let Err(e) = UpdateProgress::new(progress).emit(&self.app_handle) {
-                            log::error!("failed to emit update progress: {:?}", e);
-                        }
-                    },
-                    || {
-                        log::info!("Update download completed");
-                        if let Err(e) = UpdateProgress::new(100f32).emit(&self.app_handle) {
-                            log::error!("Failed to emit update progress: {:?}", e);
-                        }
-                    },
-                )
-                .await?;
-
-            self.downloaded_update_data = Some(downloaded_data);
-        }
-
+        log::info!("Auto-update disabled, skipping download.");
         Ok(())
     }
 
     pub fn install_update(&self) -> Result<(), String> {
-        if self.update_handler.is_none() {
-            return Err("No update available".to_string());
-        }
-        if self.downloaded_update_data.is_none() {
-            return Err("No update downloaded".to_string());
-        }
-
-        let update = self.update_handler.as_ref().unwrap();
-        let data = self.downloaded_update_data.as_ref().unwrap();
-
-        update
-            .install(&data)
-            .map_err(|e| format!("Failed to install update: {:?}", e))?;
-
-        Ok(())
+        Err("Auto-update disabled".to_string())
     }
 
     pub fn is_initialized(&self) -> bool {

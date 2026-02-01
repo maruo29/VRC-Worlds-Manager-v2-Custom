@@ -8,7 +8,6 @@ use state::InitCell;
 use std::sync::{Arc, RwLock};
 use tauri::async_runtime::Mutex;
 use tauri::{AppHandle, Emitter, Manager};
-use tauri_plugin_updater::UpdaterExt;
 use tauri_specta::collect_events;
 
 use crate::services::memo_manager::MemoManager;
@@ -89,7 +88,7 @@ pub fn run() {
     tauri_builder = tauri_builder.plugin(tauri_plugin_deep_link::init());
 
     tauri_builder
-        .plugin(tauri_plugin_updater::Builder::new().build())
+
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
@@ -203,15 +202,6 @@ fn initialize_app() -> Result<(), String> {
     }
 }
 
-fn get_update_handler(app: AppHandle, channel: &UpdateChannel) -> UpdateHandler {
-    tauri::async_runtime::block_on(async move {
-        let mut update_handler = UpdateHandler::new(app);
-        let result = update_handler.check_for_update(channel).await;
-
-        if result.is_err() {
-            log::error!("Failed to check for update: {}", result.unwrap_err());
-        }
-
-        update_handler
-    })
+fn get_update_handler(app: AppHandle, _channel: &UpdateChannel) -> UpdateHandler {
+    UpdateHandler::new(app)
 }
