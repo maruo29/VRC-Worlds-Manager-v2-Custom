@@ -70,7 +70,6 @@ export const useUpdateDialog = ({
   useEffect(() => {
     let isCancelled = false;
     let callbackExecuted = false;
-    let unlistenProgressFn: UnlistenFn | undefined = undefined;
     let unlistenCompleteFn: UnlistenFn | undefined = undefined;
 
     const setupListener = async () => {
@@ -108,18 +107,6 @@ export const useUpdateDialog = ({
         });
 
         if (isCancelled) {
-          unlistenCompleteFn();
-          return;
-        }
-
-        unlistenProgressFn = await events.updateProgress.listen((e) => {
-          if (isCancelled) return;
-
-          setProgress(e.payload.progress * 100);
-        });
-
-        if (isCancelled) {
-          unlistenProgressFn();
           unlistenCompleteFn();
           return;
         }
@@ -162,7 +149,6 @@ export const useUpdateDialog = ({
 
     return () => {
       isCancelled = true;
-      unlistenProgressFn?.();
       unlistenCompleteFn?.();
     };
   }, [taskId, onCancelButtonClick, t, toast]);
