@@ -8,22 +8,15 @@ use std::fs;
 
 pub struct EncryptionService;
 
-const ENCRYPTION_KEY: Option<&str> = option_env!("ENCRYPTION_KEY");
-const ENCRYPTION_IV: Option<&str> = option_env!("ENCRYPTION_IV");
+// Hardcoded keys to ensure persistence across all environments (Dev & Prod)
+// Key: 32 bytes, IV: 16 bytes (Base64 encoded)
+const ENCRYPTION_KEY: &str = "X03MO1qnZdYdgyfehuLPOSuVmQiqqBWlGYQqJ3mLZxw=";
+const ENCRYPTION_IV: &str = "koDYXBVvNOngM3tdGUiKCw==";
 
 impl EncryptionService {
-    pub fn are_keys_set() -> bool {
-        ENCRYPTION_KEY.is_some() && ENCRYPTION_IV.is_some()
-    }
-
     fn get_encryption_keys() -> Result<(Vec<u8>, Vec<u8>), String> {
-        let key_str = ENCRYPTION_KEY.ok_or_else(|| {
-            "ENCRYPTION_KEY environment variable not set at compile time".to_string()
-        })?;
-
-        let iv_str = ENCRYPTION_IV.ok_or_else(|| {
-            "ENCRYPTION_IV environment variable not set at compile time".to_string()
-        })?;
+        let key_str = ENCRYPTION_KEY;
+        let iv_str = ENCRYPTION_IV;
 
         // Convert from base64 to bytes for AES
         let key = STANDARD
