@@ -21,21 +21,10 @@ impl FileService {
     /// Returns the path to the application directory
     #[must_use]
     fn get_app_dir() -> PathBuf {
-        let base_dirs = BaseDirs::new().expect("Failed to get base directories");
-        let data_dir = base_dirs.data_local_dir();
-        
-        // Check for original folder structure first to preserve data
-        // Original app used "VRC World Manager" (with spaces)
-        let old_path = data_dir.join("VRC World Manager"); // Standardize on original path name if possible
-        
-        // If old path exists, use it to maintain session/settings
-        if old_path.exists() {
-             return old_path;
-        }
-
-        // Fallback to "vrc-worlds-manager" (matching productName) if old path doesn't exist
-        // Avoiding "VRC_Worlds_Manager_new" to prevent fragmentation
-        data_dir.join("vrc-worlds-manager")
+        BaseDirs::new()
+            .expect("Failed to get base directories")
+            .data_local_dir()
+            .join("VRC_Worlds_Manager_new")
     }
 
     /// Gets the paths for the configuration and data files

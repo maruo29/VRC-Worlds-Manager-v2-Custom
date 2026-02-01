@@ -49,12 +49,6 @@
         }
     },
     "plugins": {
-        "updater": {
-            "endpoints": [
-                "https://github.com/maruo29/VRC-Worlds-Manager-v2-Custom/releases/latest/download/latest.json"
-            ],
-            "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDE2M0NBNjU1RUI3RDk0MDMKUldRRGxIM3JWYVk4RnEyTEZDaE5RMWNFU1ZZdmtQZnZMWStDS2VldEFoVGFZTTc1aHBSN1ZGS3UK"
-        },
         "deep-link": {
             "mobile": [
                 {

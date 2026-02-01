@@ -67,14 +67,8 @@ export const useUpdateDialogContext = (): ReturnProps => {
   }, []);
 
   const executeUpdateCheck = useCallback(async () => {
-    const updateAvailable = await checkForUpdate();
-
-    if (!updateAvailable) {
-      return;
-    }
-
-    setUpdateNotificationVisible(true);
-    setIsNotificationClosing(false);
+    // Auto-update disabled by user request
+    return;
   }, []);
 
   return {
