@@ -21,10 +21,21 @@ impl FileService {
     /// Returns the path to the application directory
     #[must_use]
     fn get_app_dir() -> PathBuf {
-        BaseDirs::new()
-            .expect("Failed to get base directories")
-            .data_local_dir()
-            .join("VRC_Worlds_Manager_new")
+        let base_dirs = BaseDirs::new().expect("Failed to get base directories");
+        let data_dir = base_dirs.data_local_dir();
+        
+        // Check for original folder structure first to preserve data
+        // Original app used "VRC World Manager" (with spaces)
+        let old_path = data_dir.join("VRC World Manager"); // Standardize on original path name if possible
+        
+        // If old path exists, use it to maintain session/settings
+        if old_path.exists() {
+             return old_path;
+        }
+
+        // Fallback to "vrc-worlds-manager" (matching productName) if old path doesn't exist
+        // Avoiding "VRC_Worlds_Manager_new" to prevent fragmentation
+        data_dir.join("vrc-worlds-manager")
     }
 
     /// Gets the paths for the configuration and data files
@@ -360,9 +371,23 @@ impl FileService {
         let cookies = match Self::read_auth_file(&cookies_path) {
             Ok(data) => data,
             Err(e) => {
-                log::warn!("auth.json is invalid or missing ({}), resetting...", e);
-                Self::create_empty_auth_file().ok();
-                AuthCookies::new()
+                match e {
+                    FileError::InvalidFile => {
+                        log::warn!("auth.json is strictly invalid (syntax error), resetting...");
+                        Self::create_empty_auth_file().ok();
+                        AuthCookies::new()
+                    },
+                    FileError::FileNotFound => {
+                         // Normal first run
+                         Self::create_empty_auth_file().ok();
+                         AuthCookies::new()
+                    },
+                    _ => {
+                        // For PermissionDenied or AccessDenied, DO NOT WIPE. Return empty session temporarily but don't delete file.
+                        log::error!("Failed to read auth.json ({}), returning empty session without overwriting.", e);
+                        AuthCookies::new()
+                    }
+                }
             }
         };
 
