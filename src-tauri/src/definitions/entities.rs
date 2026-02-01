@@ -417,8 +417,7 @@ impl AuthCookies {
 
         // Split the cookie string into individual cookies
         for cookie in cookie_str.split("; ") {
-            let mut parts = cookie.split('=');
-            if let (Some(name), Some(value)) = (parts.next(), parts.next()) {
+            if let Some((name, value)) = cookie.split_once('=') {
                 match name {
                     "auth" => auth_token = Some(value.to_string()),
                     "twoFactorAuth" => two_factor_auth = Some(value.to_string()),
