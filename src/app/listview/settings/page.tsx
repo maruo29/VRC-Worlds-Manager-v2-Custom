@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { WorldCardPreview } from '@/components/world-card';
 import { Platform } from '@/types/worlds';
 import { FolderRemovalPreference, UpdateChannel, DefaultInstanceType } from '@/lib/bindings';
@@ -60,6 +61,8 @@ export default function SettingsPage() {
     defaultInstanceType,
     openHiddenFolder,
     handleNativeExport,
+    visibleButtons,
+    handleVisibleButtonsChange,
     t,
   } = useSettingsPage();
 
@@ -213,9 +216,58 @@ export default function SettingsPage() {
                 isShared: false,
                 isFavorite: false,
               }}
+              isVisibleButtons={visibleButtons}
               onTogglePhotographed={() => { }}
               onToggleShared={() => { }}
             />
+          </Card>
+
+          <Card className="flex flex-col space-y-3 p-4 rounded-lg border">
+            <div className="flex flex-col space-y-1.5 pb-2">
+              <Label className="text-base font-medium">ボタン表示設定</Label>
+              <div className="text-sm text-muted-foreground">
+                ワールドカード上のアクションボタンの表示/非表示を切り替えます
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Label htmlFor="show-favorite" className="text-sm font-normal cursor-pointer">
+                お気に入りボタンを表示
+              </Label>
+              <Switch
+                id="show-favorite"
+                checked={visibleButtons.favorite}
+                onCheckedChange={(checked: boolean) =>
+                  handleVisibleButtonsChange('favorite', checked)
+                }
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Label htmlFor="show-photographed" className="text-sm font-normal cursor-pointer">
+                撮影済みボタンを表示
+              </Label>
+              <Switch
+                id="show-photographed"
+                checked={visibleButtons.photographed}
+                onCheckedChange={(checked: boolean) =>
+                  handleVisibleButtonsChange('photographed', checked)
+                }
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Label htmlFor="show-shared" className="text-sm font-normal cursor-pointer">
+                共有済みボタンを表示
+              </Label>
+              <Switch
+                id="show-shared"
+                checked={visibleButtons.shared}
+                onCheckedChange={(checked: boolean) =>
+                  handleVisibleButtonsChange('shared', checked)
+                }
+              />
+            </div>
           </Card>
         </TabsContent>
 

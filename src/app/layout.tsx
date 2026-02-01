@@ -5,7 +5,7 @@ import { Toaster } from '@/components/ui/sonner';
 
 import '@/app/globals.css';
 import { LocalizationContextProvider } from '@/components/localization-context';
-import { UpdateDialogProvider } from '@/components/UpdateDialogContext';
+
 import { DeepLinkProvider } from '@/components/deep-link-provider';
 import { PatreonProvider } from '@/contexts/patreon-context';
 
@@ -40,11 +40,9 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <LocalizationContextProvider>
-              <UpdateDialogProvider>
-                <PatreonProvider>
-                  <main>{children}</main>
-                </PatreonProvider>
-              </UpdateDialogProvider>
+              <PatreonProvider>
+                <main>{children}</main>
+              </PatreonProvider>
             </LocalizationContextProvider>
           </ThemeProvider>
           <Toaster richColors />

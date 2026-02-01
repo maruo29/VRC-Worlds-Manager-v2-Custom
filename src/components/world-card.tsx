@@ -4,7 +4,7 @@ import QPc from '@/../public/icons/VennColorQPc.svg';
 import QPcQ from '@/../public/icons/VennColorQPcQ.svg';
 import QQ from '@/../public/icons/VennColorQQ.svg';
 import { Platform } from '@/types/worlds';
-import { CardSize, WorldDisplayData } from '@/lib/bindings';
+import { CardSize, WorldDisplayData, VisibleButtons } from '@/lib/bindings';
 import { useLocalization } from '@/hooks/use-localization';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { useFolders } from '@/app/listview/hook/use-folders';
@@ -55,10 +55,11 @@ interface WorldCardPreviewProps {
   onToggleFavorite?: (worldId: string, current: boolean) => void;
   onTogglePhotographed?: (worldId: string, current: boolean) => void;
   onToggleShared?: (worldId: string, current: boolean) => void;
+  isVisibleButtons?: VisibleButtons;
 }
 
 export function WorldCardPreview(props: WorldCardPreviewProps) {
-  const { size, world, onToggleFavorite, onTogglePhotographed, onToggleShared } = props;
+  const { size, world, onToggleFavorite, onTogglePhotographed, onToggleShared, isVisibleButtons } = props;
   const { t } = useLocalization();
   const sizeClasses: Record<CardSize, string> = {
     Compact: 'w-48 h-32',
@@ -124,59 +125,65 @@ export function WorldCardPreview(props: WorldCardPreviewProps) {
 
         {/* Status flags overlay */}
         <div className="absolute bottom-2 right-2 z-10 flex gap-1">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div
-                  className={`p-1.5 rounded-full cursor-pointer backdrop-blur-md transition-colors ${world.isFavorite ? 'bg-yellow-500/80 text-white hover:bg-yellow-600/90' : 'bg-black/40 text-white/70 hover:bg-black/60 hover:text-white'}`}
-                  onClick={handleFavoriteClick}
-                  onDoubleClick={preventPropagation}
-                  onMouseDown={preventPropagation}
-                >
-                  <Star className="w-3.5 h-3.5" />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{t('world-card:favorite')}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          {(!isVisibleButtons || isVisibleButtons.favorite) && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    className={`p-1.5 rounded-full cursor-pointer backdrop-blur-md transition-colors ${world.isFavorite ? 'bg-yellow-500/80 text-white hover:bg-yellow-600/90' : 'bg-black/40 text-white/70 hover:bg-black/60 hover:text-white'}`}
+                    onClick={handleFavoriteClick}
+                    onDoubleClick={preventPropagation}
+                    onMouseDown={preventPropagation}
+                  >
+                    <Star className="w-3.5 h-3.5" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{t('world-card:favorite')}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
 
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div
-                  className={`p-1.5 rounded-full cursor-pointer backdrop-blur-md transition-colors ${world.isPhotographed ? 'bg-green-500/80 text-white hover:bg-green-600/90' : 'bg-black/40 text-white/70 hover:bg-black/60 hover:text-white'}`}
-                  onClick={handlePhotographedClick}
-                  onDoubleClick={preventPropagation}
-                  onMouseDown={preventPropagation}
-                >
-                  <Camera className="w-3.5 h-3.5" />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{t('world-card:photographed')}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          {(!isVisibleButtons || isVisibleButtons.photographed) && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    className={`p-1.5 rounded-full cursor-pointer backdrop-blur-md transition-colors ${world.isPhotographed ? 'bg-green-500/80 text-white hover:bg-green-600/90' : 'bg-black/40 text-white/70 hover:bg-black/60 hover:text-white'}`}
+                    onClick={handlePhotographedClick}
+                    onDoubleClick={preventPropagation}
+                    onMouseDown={preventPropagation}
+                  >
+                    <Camera className="w-3.5 h-3.5" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{t('world-card:photographed')}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
 
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div
-                  className={`p-1.5 rounded-full cursor-pointer backdrop-blur-md transition-colors ${world.isShared ? 'bg-blue-500/80 text-white hover:bg-blue-600/90' : 'bg-black/40 text-white/70 hover:bg-black/60 hover:text-white'}`}
-                  onClick={handleSharedClick}
-                  onDoubleClick={preventPropagation}
-                  onMouseDown={preventPropagation}
-                >
-                  <Share2 className="w-3.5 h-3.5" />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{t('world-card:shared')}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          {(!isVisibleButtons || isVisibleButtons.shared) && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    className={`p-1.5 rounded-full cursor-pointer backdrop-blur-md transition-colors ${world.isShared ? 'bg-blue-500/80 text-white hover:bg-blue-600/90' : 'bg-black/40 text-white/70 hover:bg-black/60 hover:text-white'}`}
+                    onClick={handleSharedClick}
+                    onDoubleClick={preventPropagation}
+                    onMouseDown={preventPropagation}
+                  >
+                    <Share2 className="w-3.5 h-3.5" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{t('world-card:shared')}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
 
         <img

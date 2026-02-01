@@ -70,6 +70,7 @@ export function WorldGrid({
     handleSetFavorite,
     handleSetPhotographed,
     handleSetShared,
+    visibleButtons,
   } = useWorldGrid(currentFolder, worlds);
 
   const gap = 16;
@@ -141,6 +142,7 @@ export function WorldGrid({
                 <WorldCardPreview
                   size={cardSize}
                   world={world}
+                  isVisibleButtons={visibleButtons}
                   onToggleFavorite={handleSetFavorite}
                   onTogglePhotographed={handleSetPhotographed}
                   onToggleShared={handleSetShared}

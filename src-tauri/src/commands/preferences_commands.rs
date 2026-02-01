@@ -273,3 +273,24 @@ pub fn set_default_instance_type(instance_type: DefaultInstanceType) -> Result<(
     })?;
     Ok(())
 }
+
+#[tauri::command]
+#[specta::specta]
+pub fn get_visible_buttons() -> Result<crate::definitions::VisibleButtons, String> {
+    let preferences_lock = PREFERENCES.get().read();
+    let preferences = preferences_lock.as_ref().unwrap();
+    Ok(preferences.visible_buttons.clone())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn set_visible_buttons(visible_buttons: crate::definitions::VisibleButtons) -> Result<(), String> {
+    let mut preferences_lock = PREFERENCES.get().write();
+    let preferences = preferences_lock.as_mut().unwrap();
+    preferences.visible_buttons = visible_buttons;
+    FileService::write_preferences(preferences).map_err(|e| {
+        log::error!("Error writing preferences: {}", e);
+        e.to_string()
+    })?;
+    Ok(())
+}

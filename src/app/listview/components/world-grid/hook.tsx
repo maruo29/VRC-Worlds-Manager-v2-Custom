@@ -1,4 +1,4 @@
-import { CardSize, commands, WorldDisplayData } from '@/lib/bindings';
+import { CardSize, commands, WorldDisplayData, VisibleButtons } from '@/lib/bindings';
 import { usePopupStore } from '../../hook/usePopups/store';
 import { toast } from 'sonner';
 import { useLocalization } from '@/hooks/use-localization';
@@ -47,6 +47,28 @@ export function useWorldGrid(
       toast(t('general:error-title'), {
         description: t('listview-page:error-load-card-size'),
       });
+    }
+  };
+
+
+  const [visibleButtons, setVisibleButtons] = useState<VisibleButtons>({
+    favorite: true,
+    photographed: true,
+    shared: true,
+  });
+
+  useEffect(() => {
+    loadVisibleButtons();
+  }, []);
+
+  const loadVisibleButtons = async () => {
+    try {
+      const result = await commands.getVisibleButtons();
+      if (result.status === 'ok') {
+        setVisibleButtons(result.data);
+      }
+    } catch (e) {
+      error(`Failed to load visible buttons: ${e}`);
     }
   };
 
@@ -441,5 +463,6 @@ export function useWorldGrid(
     isSpecialFolder,
     isHiddenFolder,
     existingWorldIds,
+    visibleButtons,
   };
 }

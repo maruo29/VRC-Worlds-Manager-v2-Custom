@@ -1,0 +1,1177 @@
+cargo : warning: vrc-wor
+lds-manager@1.3.0-6: Fou
+nd .env file, loading en
+vironment variables for 
+development
+???? ?:1 ??:1
++ cargo check 2>&1 | Out
+-File -Encoding ASCII ch
+eck_result.txt
++ ~~~~~~~~~~~~~~~~
+    + CategoryInfo      
+        : NotSpecified  
+  : (warning: vrc-wo.   
+ ..for development:S    
+tring) [], RemoteEx    c
+eption
+    + FullyQualifiedErr 
+   orId : NativeComman  
+  dError
+ 
+    Checking vrc-worlds-
+manager v1.3.0-6 (D:\dow
+nload\VRC-Worlds-Manager
+-v2-vrc-world-manager-v1
+.3.0-rc.0\src-tauri)
+warning: unused imports:
+ `AppHandle` and `Manage
+r`
+ --> src\api\common.rs:4
+:13
+  |
+4 | use tauri::{AppHandl
+e, Manager};
+  |             ^^^^^^^^
+^  ^^^^^^^
+  |
+  = note: `#[warn(unused
+_imports)]` (part of `#[
+warn(unused)]`) on by de
+fault
+
+warning: unused imports:
+ `Duration` and `sleep`
+ --> src\api\common.rs:5
+:19
+  |
+5 | use tokio::time::{sl
+eep, Duration};
+  |                   ^^
+^^^  ^^^^^^^^
+
+warning: unused import: 
+`crate::api::RateLimitSt
+ore`
+ --> src\api\common.rs:7
+:5
+  |
+7 | use crate::api::Rate
+LimitStore;
+  |     ^^^^^^^^^^^^^^^^
+^^^^^^^^^^
+
+warning: unused import: 
+`definitions::VRChatAuth
+Phase`
+ --> src\api\auth\mod.rs
+:4:9
+  |
+4 | pub use definitions:
+:VRChatAuthPhase;
+  |         ^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
+
+warning: unused import: 
+`definitions::GroupInsta
+nceCreateAllowedType`
+ --> src\api\group\mod.r
+s:4:9
+  |
+4 | pub use definitions:
+:GroupInstanceCreateAllo
+wedType;
+  |         ^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^
+
+warning: unused import: 
+`definitions::GroupInsta
+nceCreatePermission`
+ --> src\api\group\mod.r
+s:5:9
+  |
+5 | pub use definitions:
+:GroupInstanceCreatePerm
+ission;
+  |         ^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^
+
+warning: unused import: 
+`definitions::GroupMembe
+rVisibility`
+ --> src\api\group\mod.r
+s:7:9
+  |
+7 | pub use definitions:
+:GroupMemberVisibility;
+  |         ^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: 
+`definitions::GroupRole`
+ --> src\api\group\mod.r
+s:8:9
+  |
+8 | pub use definitions:
+:GroupRole;
+  |         ^^^^^^^^^^^^
+^^^^^^^^^^
+
+warning: unused import: 
+`world`
+  --> src\api\instance\l
+ogic.rs:11:5
+   |
+11 |     world,
+   |     ^^^^^
+
+warning: unused import: 
+`definitions::CreateInst
+anceRequest`
+ --> src\api\instance\mo
+d.rs:4:9
+  |
+4 | pub use definitions:
+:CreateInstanceRequest;
+  |         ^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: 
+`Serialize`
+ --> src\api\invite\defi
+nitions.rs:1:26
+  |
+1 | use serde::{Deserial
+ize, Serialize};
+  |                     
+     ^^^^^^^^^
+
+warning: unused import: 
+`definitions::Notificati
+onType`
+ --> src\api\invite\mod.
+rs:4:9
+  |
+4 | pub use definitions:
+:NotificationType;
+  |         ^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
+
+warning: unused import: 
+`definitions::SelfInvite
+Response`
+ --> src\api\invite\mod.
+rs:5:9
+  |
+5 | pub use definitions:
+:SelfInviteResponse;
+  |         ^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: 
+`std::fmt::Display`
+ --> src\api\world\defin
+itions.rs:7:5
+  |
+7 | use std::fmt::Displa
+y;
+  |     ^^^^^^^^^^^^^^^^
+^
+
+warning: unused import: 
+`serde::Deserialize`
+ --> src\api\world\logic
+.rs:5:5
+  |
+5 | use serde::Deseriali
+ze;
+  |     ^^^^^^^^^^^^^^^^
+^^
+
+warning: unused import: 
+`definitions::FavoriteWo
+rld`
+ --> src\api\world\mod.r
+s:4:9
+  |
+4 | pub use definitions:
+:FavoriteWorld;
+  |         ^^^^^^^^^^^^
+^^^^^^^^^^^^^^
+
+warning: unused imports:
+ `FOLDERS` and `WORLDS`
+ --> src\commands\data\r
+ead_data_commands.rs:4:1
+3
+  |
+4 | use crate::{FOLDERS,
+ PREFERENCES, WORLDS};
+  |             ^^^^^^^ 
+              ^^^^^^
+
+warning: unused import: 
+`crate::definitions::Car
+dSize`
+ --> src\commands\data\w
+rite_data_commands.rs:2:
+5
+  |
+2 | use crate::definitio
+ns::CardSize;
+  |     ^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^
+
+warning: unused import: 
+`CustomPreferences`
+  --> src\definitions\mo
+d.rs:10:35
+   |
+10 | pub use custom_data
+::{CustomData, CustomPre
+ferences};
+   |                    
+               ^^^^^^^^^
+^^^^^^^^
+
+warning: unused import: 
+`VRChatWorld`
+ --> src\services\api_se
+rvice.rs:2:42
+  |
+2 | use crate::api::worl
+d::{SearchWorldSort, VRC
+hatWorld, WorldSearchPar
+ametersBuilder};
+  |                     
+                     ^^^
+^^^^^^^^
+
+warning: unused import: 
+`crate::services::api_se
+rvice::world::WorldSearc
+hParameters`
+ --> src\services\api_se
+rvice.rs:5:5
+  |
+5 | use crate::services:
+:api_service::world::Wor
+ldSearchParameters;
+  |     ^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
+
+warning: unused import: 
+`crate::services::Folder
+Manager`
+ --> src\services\api_se
+rvice.rs:7:5
+  |
+7 | use crate::services:
+:FolderManager;
+  |     ^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^
+
+warning: unused import: 
+`Client`
+  --> src\services\api_s
+ervice.rs:11:28
+   |
+11 | use reqwest::{cooki
+e::Jar, Client, Url};
+   |                    
+        ^^^^^^
+
+warning: unused import: 
+`RwLock`
+  --> src\services\api_s
+ervice.rs:12:22
+   |
+12 | use std::sync::{Arc
+, RwLock};
+   |                    
+  ^^^^^^
+
+warning: unused import: 
+`std::fs`
+ --> src\services\encryp
+tion_service.rs:7:5
+  |
+7 | use std::fs;
+  |     ^^^^^^^
+
+warning: unused import: 
+`log::debug`
+ --> src\services\file_s
+ervice.rs:6:5
+  |
+6 | use log::debug;
+  |     ^^^^^^^^^^
+
+warning: unused import: 
+`std::ffi::OsString`
+ --> src\services\file_s
+ervice.rs:8:5
+  |
+8 | use std::ffi::OsStri
+ng;
+  |     ^^^^^^^^^^^^^^^^
+^^
+
+warning: unused import: 
+`HashSet`
+ --> src\services\folder
+_manager.rs:8:33
+  |
+8 | use std::collections
+::{HashMap, HashSet};
+  |                     
+            ^^^^^^^
+
+warning: unused import: 
+`std::env`
+ --> src\services\share_
+service.rs:8:5
+  |
+8 | use std::env;
+  |     ^^^^^^^^
+
+warning: unused imports:
+ `initialize_app` and `s
+et_preferences`
+  --> src\services\mod.r
+s:18:30
+   |
+18 | pub use initialize_
+service::{initialize_app
+, set_preferences};
+   |                    
+          ^^^^^^^^^^^^^^
+  ^^^^^^^^^^^^^^^
+
+warning: unused imports:
+ `download_folder` and `
+share_folder`
+  --> src\services\mod.r
+s:19:25
+   |
+19 | pub use share_servi
+ce::{download_folder, sh
+are_folder};
+   |                    
+     ^^^^^^^^^^^^^^^  ^^
+^^^^^^^^^^
+
+warning: unused import: 
+`Url`
+ --> src\updater\update_
+handler.rs:2:24
+  |
+2 | use tauri::{AppHandl
+e, Url};
+  |                     
+   ^^^
+
+warning: unused import: 
+`UpdaterExt`
+ --> src\updater\update_
+handler.rs:3:36
+  |
+3 | use tauri_plugin_upd
+ater::{Update, UpdaterEx
+t};
+  |                     
+               ^^^^^^^^^
+^
+
+warning: unused import: 
+`tauri_specta::Event`
+ --> src\updater\update_
+handler.rs:4:5
+  |
+4 | use tauri_specta::Ev
+ent;
+  |     ^^^^^^^^^^^^^^^^
+^^^
+
+warning: unnecessary par
+entheses around function
+ argument
+   --> src\lib.rs:152:17
+    |
+152 |                 (g
+et_update_handler(
+    |                 ^
+...
+159 |                 ))
+,
+    |                  ^
+    |
+    = note: `#[warn(unus
+ed_parens)]` (part of `#
+[warn(unused)]`) on by d
+efault
+help: remove these paren
+theses
+    |
+152 ~                 ge
+t_update_handler(
+153 |                   
+  app.handle().clone(),
+...
+158 |                   
+      .update_channel,
+159 ~                 ) 
+,
+    |
+
+warning: use of deprecat
+ed function `rand::threa
+d_rng`: Renamed to `rng`
+   --> src\api\common.rs
+:128:24
+    |
+128 |     let jitter = r
+and::thread_rng().gen_ra
+nge(0..=half_backoff);
+    |                   
+     ^^^^^^^^^^
+    |
+    = note: `#[warn(depr
+ecated)]` on by default
+
+warning: variable does n
+ot need to be mutable
+   --> src\migration\log
+ic.rs:373:13
+    |
+373 |         let mut ol
+d_worlds = Self::parse_w
+orld_data(&worlds_conten
+t)
+    |             ----^^
+^^^^^^^^
+    |             |
+    |             help: 
+remove this `mut`
+    |
+    = note: `#[warn(unus
+ed_mut)]` (part of `#[wa
+rn(unused)]`) on by defa
+ult
+
+warning: use of deprecat
+ed method `rand::Rng::ge
+n_range`: Renamed to `ra
+ndom_range`
+   --> src\api\common.rs
+:128:37
+    |
+128 |     let jitter = r
+and::thread_rng().gen_ra
+nge(0..=half_backoff);
+    |                   
+                  ^^^^^^
+^^^
+
+warning: unused variable
+: `user`
+   --> src\services\api_
+service.rs:185:57
+    |
+185 |             Ok(aut
+h::VRChatAuthStatus::Suc
+cess(cookies, user)) => 
+{
+    |                   
+                        
+              ^^^^ help:
+ if this is intentional,
+ prefix it with an under
+score: `_user`
+    |
+    = note: `#[warn(unus
+ed_variables)]` (part of
+ `#[warn(unused)]`) on b
+y default
+
+warning: unused variable
+: `user_id`
+   --> src\services\api_
+service.rs:298:9
+    |
+298 |         user_id: S
+tring,
+    |         ^^^^^^^ he
+lp: if this is intention
+al, prefix it with an un
+derscore: `_user_id`
+
+warning: unused variable
+: `app`
+   --> src\services\api_
+service.rs:550:9
+    |
+550 |         app: AppHa
+ndle,
+    |         ^^^ help: 
+if this is intentional, 
+prefix it with an unders
+core: `_app`
+
+warning: unused variable
+: `app`
+   --> src\services\api_
+service.rs:695:9
+    |
+695 |         app: AppHa
+ndle,
+    |         ^^^ help: 
+if this is intentional, 
+prefix it with an unders
+core: `_app`
+
+warning: unused variable
+: `first_idx`
+   --> src\migration\log
+ic.rs:207:29
+    |
+207 |             if let
+ Some((_, first_idx)) = 
+unique_worlds.get(&world
+.world_id) {
+    |                   
+          ^^^^^^^^^ help
+: if this is intentional
+, prefix it with an unde
+rscore: `_first_idx`
+
+warning: unused variable
+: `folders_lock`
+  --> src\services\expor
+t_service.rs:73:13
+   |
+73 |         let folders
+_lock = folders.read().m
+ap_err(|e| {
+   |             ^^^^^^^
+^^^^^ help: if this is i
+ntentional, prefix it wi
+th an underscore: `_fold
+ers_lock`
+
+warning: associated func
+tions `public`, `group_p
+ublic`, `group_plus`, an
+d `group_only` are never
+ used
+  --> src\api\instance\d
+efinitions.rs:17:12
+   |
+16 | impl InstanceType {
+   | ----------------- a
+ssociated functions in t
+his implementation
+17 |     pub fn public()
+ -> Self {
+   |            ^^^^^^
+...
+32 |     pub fn group_pu
+blic<S: AsRef<str>>(grou
+p_id: S) -> Self {
+   |            ^^^^^^^^
+^^^^
+...
+35 |     pub fn group_pl
+us<S: AsRef<str>>(group_
+id: S) -> Self {
+   |            ^^^^^^^^
+^^
+...
+38 |     pub fn group_on
+ly<S: AsRef<str>>(group_
+id: S, allowed_roles: Op
+tion<Vec<String>>) -> Se
+lf {
+   |            ^^^^^^^^
+^^
+   |
+   = note: `#[warn(dead_
+code)]` (part of `#[warn
+(unused)]`) on by defaul
+t
+
+warning: fields `id`, `o
+wner_id`, `photon_region
+`, `region`, and `short_
+name` are never read
+   --> src\api\instance\
+definitions.rs:173:9
+    |
+171 | pub struct Instanc
+e {
+    |            -------
+- fields in this struct
+172 |     #[serde(rename
+ = "id")]
+173 |     pub id: String
+,
+    |         ^^
+...
+178 |     pub owner_id: 
+Option<String>,
+    |         ^^^^^^^^
+179 |     #[serde(rename
+ = "photonRegion")]
+180 |     pub photon_reg
+ion: InstanceRegion,
+    |         ^^^^^^^^^^
+^^^
+181 |     #[serde(rename
+ = "region")]
+182 |     pub region: In
+stanceRegion,
+    |         ^^^^^^
+183 |     #[serde(rename
+ = "shortName")]
+184 |     pub short_name
+: Option<String>,
+    |         ^^^^^^^^^^
+    |
+    = note: `Instance` h
+as a derived impl for th
+e trait `Debug`, but thi
+s is intentionally ignor
+ed during dead code anal
+ysis
+
+warning: multiple fields
+ are never read
+  --> src\api\invite\def
+initions.rs:5:9
+   |
+ 4 | pub struct SelfInvi
+teResponse {
+   |            --------
+---------- fields in thi
+s struct
+ 5 |     pub created_at:
+ String,
+   |         ^^^^^^^^^^
+ 6 |     pub details: se
+rde_json::Value,
+   |         ^^^^^^^
+ 7 |     pub id: String,
+   |         ^^
+ 8 |     pub message: St
+ring,
+   |         ^^^^^^^
+ 9 |     #[serde(rename 
+= "receiverUserId")]
+10 |     pub receiver_us
+er_id: String,
+   |         ^^^^^^^^^^^
+^^^^^
+11 |     #[serde(rename 
+= "senderUserId")]
+12 |     pub sender_user
+_id: String,
+   |         ^^^^^^^^^^^
+^^^
+13 |     #[serde(rename 
+= "type")]
+14 |     pub notificatio
+n_type: NotificationType
+,
+   |         ^^^^^^^^^^^
+^^^^^^
+   |
+   = note: `SelfInviteRe
+sponse` has a derived im
+pl for the trait `Debug`
+, but this is intentiona
+lly ignored during dead 
+code analysis
+
+warning: methods `sort`,
+ `tag`, `notag`, `platfo
+rm`, and `search` are ne
+ver used
+   --> src\api\world\def
+initions.rs:379:12
+    |
+368 | impl WorldSearchPa
+rametersBuilder {
+    | ------------------
+--------------- methods 
+in this implementation
+...
+379 |     pub fn sort(mu
+t self, sort: SearchWorl
+dSort) -> Self {
+    |            ^^^^
+...
+384 |     pub fn tag<S: 
+AsRef<str>>(mut self, ta
+g: S) -> Self {
+    |            ^^^
+...
+389 |     pub fn notag<S
+: AsRef<str>>(mut self, 
+tag: S) -> Self {
+    |            ^^^^^
+...
+394 |     pub fn platfor
+m<S: AsRef<str>>(mut sel
+f, platform: S) -> Self 
+{
+    |            ^^^^^^^
+^
+...
+399 |     pub fn search<
+S: AsRef<str>>(mut self,
+ search: S) -> Self {
+    |            ^^^^^^
+
+warning: multiple varian
+ts are never constructed
+   --> src\api\world\def
+initions.rs:422:5
+    |
+416 | pub enum SearchWor
+ldSort {
+    |          ---------
+------ variants in this 
+enum
+...
+422 |     Trust,
+    |     ^^^^^
+423 |     #[serde(rename
+ = "shuffle")]
+424 |     Shuffle,
+    |     ^^^^^^^
+...
+430 |     ReportScore,
+    |     ^^^^^^^^^^^
+431 |     #[serde(rename
+ = "reportCount")]
+432 |     ReportCount,
+    |     ^^^^^^^^^^^
+...
+436 |     LabsPublicatio
+nDate,
+    |     ^^^^^^^^^^^^^^
+^^^^^
+...
+440 |     CreatedAt,
+    |     ^^^^^^^^^
+...
+444 |     UpdatedAt,
+    |     ^^^^^^^^^
+445 |     #[serde(rename
+ = "order")]
+446 |     Order,
+    |     ^^^^^
+...
+450 |     Magic,
+    |     ^^^^^
+451 |     #[serde(rename
+ = "name")]
+452 |     Name,
+    |     ^^^^
+    |
+    = note: `SearchWorld
+Sort` has a derived impl
+ for the trait `Debug`, 
+but this is intentionall
+y ignored during dead co
+de analysis
+
+warning: methods `rename
+_folder` and `remove_fol
+der` are never used
+  --> src\definitions\cu
+stom_data.rs:81:12
+   |
+39 | impl CustomData {
+   | --------------- met
+hods in this implementat
+ion
+...
+81 |     pub fn rename_f
+older(&mut self, old_nam
+e: &str, new_name: &str)
+ {
+   |            ^^^^^^^^
+^^^^^
+...
+88 |     pub fn remove_f
+older(&mut self, folder_
+name: &str) {
+   |            ^^^^^^^^
+^^^^^
+
+warning: variant `Decryp
+tionError` is never cons
+tructed
+  --> src\errors.rs:22:5
+   |
+16 | pub enum FileError 
+{
+   |          --------- 
+variant in this enum
+...
+22 |     DecryptionError
+,
+   |     ^^^^^^^^^^^^^^^
+   |
+   = note: `FileError` h
+as derived impls for the
+ traits `Clone` and `Deb
+ug`, but these are inten
+tionally ignored during 
+dead code analysis
+
+warning: variants `Incon
+sistent`, `InvalidOperat
+ion`, and `Initializatio
+nFailed` are never const
+ructed
+  --> src\errors.rs:38:5
+   |
+36 | pub enum StateError
+ {
+   |          ----------
+ variants in this enum
+37 |     /// Internal st
+ate is inconsistent or c
+orrupted
+38 |     Inconsistent(&'
+static str),
+   |     ^^^^^^^^^^^^
+39 |     /// Operation w
+ould result in invalid s
+tate
+40 |     InvalidOperatio
+n(&'static str),
+   |     ^^^^^^^^^^^^^^^
+^
+41 |     /// Required st
+ate initialization faile
+d
+42 |     InitializationF
+ailed,
+   |     ^^^^^^^^^^^^^^^
+^^^^^
+   |
+   = note: `StateError` 
+has derived impls for th
+e traits `Clone` and `De
+bug`, but these are inte
+ntionally ignored during
+ dead code analysis
+
+warning: variants `Timeo
+ut`, `ConnectionFailed`,
+ `HttpError`, and `Inval
+idResponse` are never co
+nstructed
+  --> src\errors.rs:48:5
+   |
+46 | pub enum NetworkErr
+or {
+   |          ----------
+-- variants in this enum
+47 |     /// Connection 
+timed out
+48 |     Timeout,
+   |     ^^^^^^^
+49 |     /// Failed to e
+stablish connection
+50 |     ConnectionFaile
+d,
+   |     ^^^^^^^^^^^^^^^
+^
+51 |     /// Request fai
+led with HTTP error
+52 |     HttpError(u16),
+   |     ^^^^^^^^^
+53 |     /// Response pa
+rsing failed
+54 |     InvalidResponse
+,
+   |     ^^^^^^^^^^^^^^^
+   |
+   = note: `NetworkError
+` has derived impls for 
+the traits `Clone` and `
+Debug`, but these are in
+tentionally ignored duri
+ng dead code analysis
+
+warning: variants `Authe
+nticationFailed`, `RateL
+imitExceeded`, `InvalidR
+equest`, `ResponseError`
+, and `VersionMismatch` 
+are never constructed
+  --> src\errors.rs:60:5
+   |
+58 | pub enum ApiError {
+   |          -------- v
+ariants in this enum
+59 |     /// API authent
+ication failed
+60 |     AuthenticationF
+ailed,
+   |     ^^^^^^^^^^^^^^^
+^^^^^
+61 |     /// API rate li
+mit exceeded
+62 |     RateLimitExceed
+ed,
+   |     ^^^^^^^^^^^^^^^
+^^
+63 |     /// Invalid API
+ request parameters
+64 |     InvalidRequest(
+&'static str),
+   |     ^^^^^^^^^^^^^^
+65 |     /// API returne
+d error response
+66 |     ResponseError(S
+tring),
+   |     ^^^^^^^^^^^^^
+67 |     /// API version
+ mismatch
+68 |     VersionMismatch
+,
+   |     ^^^^^^^^^^^^^^^
+   |
+   = note: `ApiError` ha
+s derived impls for the 
+traits `Clone` and `Debu
+g`, but these are intent
+ionally ignored during d
+ead code analysis
+
+warning: variants `Dupli
+cateFolder`, `DuplicateW
+orld`, and `InvalidOpera
+tion` are never construc
+ted
+  --> src\errors.rs:78:5
+   |
+72 | pub enum EntityErro
+r {
+   |          ----------
+- variants in this enum
+...
+78 |     DuplicateFolder
+(String),
+   |     ^^^^^^^^^^^^^^^
+79 |     /// Duplicate w
+orld in folder
+80 |     DuplicateWorld(
+String),
+   |     ^^^^^^^^^^^^^^
+81 |     /// Invalid ope
+ration
+82 |     InvalidOperatio
+n(String),
+   |     ^^^^^^^^^^^^^^^
+^
+   |
+   = note: `EntityError`
+ has derived impls for t
+he traits `Clone` and `D
+ebug`, but these are int
+entionally ignored durin
+g dead code analysis
+
+warning: enum `ServiceEr
+rors` is never used
+  --> src\errors.rs:87:1
+0
+   |
+87 | pub enum ServiceErr
+ors {
+   |          ^^^^^^^^^^
+^^^
+
+warning: struct `Logger`
+ is never constructed
+  --> src\logging\defini
+tions.rs:21:12
+   |
+21 | pub struct Logger {
+   |            ^^^^^^
+
+warning: enum `LogLevel`
+ is never used
+  --> src\logging\defini
+tions.rs:59:10
+   |
+59 | pub enum LogLevel {
+   |          ^^^^^^^^
+
+warning: struct `LogEntr
+y` is never constructed
+  --> src\logging\defini
+tions.rs:92:12
+   |
+92 | pub struct LogEntry
+ {
+   |            ^^^^^^^^
+
+warning: associated func
+tion `new` is never used
+   --> src\logging\defin
+itions.rs:101:12
+    |
+100 | impl LogEntry {
+    | ------------- asso
+ciated function in this 
+implementation
+101 |     pub fn new(rec
+ord: &Record) -> Self {
+    |            ^^^
+
+warning: function `to_rf
+c3339_micros` is never u
+sed
+   --> src\logging\defin
+itions.rs:125:4
+    |
+125 | fn to_rfc3339_micr
+os<S>(
+    |    ^^^^^^^^^^^^^^^
+^^
+
+warning: enum `LogChanne
+lMessage` is never used
+   --> src\logging\defin
+itions.rs:136:10
+    |
+136 | pub enum LogChanne
+lMessage {
+    |          ^^^^^^^^^
+^^^^^^^^
+
+warning: static `LOG_BUF
+FER` is never used
+  --> src\logging\worker
+.rs:22:8
+   |
+22 | static LOG_BUFFER: 
+Mutex<ConstGenericRingBu
+ffer<LogEntry, 256>> =
+   |        ^^^^^^^^^^
+
+warning: function `get_l
+ogs` is never used
+  --> src\logging\worker
+.rs:25:8
+   |
+25 | pub fn get_logs() -
+> Vec<LogEntry> {
+   |        ^^^^^^^^
+
+warning: function `set_p
+references` is never use
+d
+  --> src\services\initi
+alize_service.rs:56:8
+   |
+56 | pub fn set_preferen
+ces(
+   |        ^^^^^^^^^^^^
+^^^
+
+warning: fields `app_han
+dle`, `update_handler`, 
+and `downloaded_update_d
+ata` are never read
+  --> src\updater\update
+_handler.rs:10:5
+   |
+ 9 | pub struct UpdateHa
+ndler {
+   |            --------
+----- fields in this str
+uct
+10 |     app_handle: App
+Handle,
+   |     ^^^^^^^^^^
+...
+15 |     update_handler:
+ Option<Update>,
+   |     ^^^^^^^^^^^^^^
+16 |
+17 |     downloaded_upda
+te_data: Option<Vec<u8>>
+,
+   |     ^^^^^^^^^^^^^^^
+^^^^^^^
+   |
+   = note: `UpdateHandle
+r` has a derived impl fo
+r the trait `Clone`, but
+ this is intentionally i
+gnored during dead code 
+analysis
+
+warning: associated func
+tion `new` is never used
+  --> src\updater\update
+_handler.rs:29:12
+   |
+28 | impl UpdateProgress
+ {
+   | -------------------
+ associated function in 
+this implementation
+29 |     pub fn new(prog
+ress: f32) -> Self {
+   |            ^^^
+
+warning: method `check_f
+or_update` is never used
+  --> src\updater\update
+_handler.rs:51:18
+   |
+34 | impl UpdateHandler 
+{
+   | ------------------ 
+method in this implement
+ation
+...
+51 |     pub async fn ch
+eck_for_update(
+   |                  ^^
+^^^^^^^^^^^^^^
+
+warning: method `as_str`
+ is never used
+   --> src\updater\updat
+e_handler.rs:109:12
+    |
+108 | impl UpdateChannel
+ {
+    | ------------------
+ method in this implemen
+tation
+109 |     pub fn as_str(
+&self) -> &str {
+    |            ^^^^^^
+
+warning: `vrc-worlds-man
+ager` (lib) generated 69
+ warnings (run `cargo fi
+x --lib -p vrc-worlds-ma
+nager` to apply 42 sugge
+stions)
+    Finished `dev` profi
+le [unoptimized + debugi
+nfo] target(s) in 5.46s

@@ -13,7 +13,7 @@ use tauri_specta::collect_events;
 use crate::services::memo_manager::MemoManager;
 use crate::task::cancellable_task::TaskContainer;
 use crate::task::definitions::TaskStatusChanged;
-use crate::updater::update_handler::{UpdateChannel, UpdateHandler, UpdateProgress};
+
 
 mod api;
 mod backup;
@@ -41,7 +41,7 @@ pub struct StartupDeepLink(pub std::sync::Mutex<Option<String>>);
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let builder =
-        generate_tauri_specta_builder().events(collect_events![TaskStatusChanged, UpdateProgress]);
+        generate_tauri_specta_builder().events(collect_events![TaskStatusChanged]);
 
     #[cfg(debug_assertions)]
     builder
@@ -148,16 +148,7 @@ pub fn run() {
                 log::error!("Failed to initialize app: {}", e);
             }
 
-            app.manage(Arc::new(Mutex::new(
-                (get_update_handler(
-                    app.handle().clone(),
-                    &PREFERENCES
-                        .get()
-                        .read()
-                        .expect("Failed to read preferences")
-                        .update_channel,
-                )),
-            )));
+
 
             Ok(())
         })
@@ -202,6 +193,4 @@ fn initialize_app() -> Result<(), String> {
     }
 }
 
-fn get_update_handler(app: AppHandle, _channel: &UpdateChannel) -> UpdateHandler {
-    UpdateHandler::new(app)
-}
+

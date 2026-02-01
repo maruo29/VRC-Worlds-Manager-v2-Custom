@@ -297,6 +297,25 @@ pub enum DefaultInstanceType {
     Invite,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, specta::Type)]
+pub struct VisibleButtons {
+    pub favorite: bool,
+    #[serde(rename = "photographed")]
+    pub photographed: bool,
+    #[serde(rename = "shared")]
+    pub shared: bool,
+}
+
+impl Default for VisibleButtons {
+    fn default() -> Self {
+        Self {
+            favorite: true,
+            photographed: true,
+            shared: true,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PreferenceModel {
     #[serde(rename = "firstTime")]
@@ -326,6 +345,12 @@ pub struct PreferenceModel {
     /// Default instance type - stored in custom_data.json for backward compatibility
     #[serde(skip)]
     pub default_instance_type: DefaultInstanceType,
+    #[serde(rename = "visibleButtons", default = "default_visible_buttons")]
+    pub visible_buttons: VisibleButtons,
+}
+
+fn default_visible_buttons() -> VisibleButtons {
+    VisibleButtons::default()
 }
 
 fn default_region() -> InstanceRegion {
@@ -362,6 +387,7 @@ impl PreferenceModel {
             sort_field: "dateAdded".to_string(),
             sort_direction: "desc".to_string(),
             default_instance_type: DefaultInstanceType::Public,
+            visible_buttons: VisibleButtons::default(),
         }
     }
 }

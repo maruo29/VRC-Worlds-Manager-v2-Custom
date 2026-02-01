@@ -5,6 +5,7 @@ import {
   DefaultInstanceType,
   FolderRemovalPreference,
   UpdateChannel,
+  VisibleButtons,
 } from '@/lib/bindings';
 import { error, info } from '@tauri-apps/plugin-log';
 import { useContext, useEffect, useState } from 'react';
@@ -116,6 +117,11 @@ export const useSettingsPage = () => {
         const defaultInstanceTypeResult = await commands.getDefaultInstanceType();
         if (defaultInstanceTypeResult.status === 'ok') {
           setDefaultInstanceType(defaultInstanceTypeResult.data);
+        }
+
+        const visibleButtonsResult = await commands.getVisibleButtons();
+        if (visibleButtonsResult.status === 'ok') {
+          setVisibleButtons(visibleButtonsResult.data);
         }
         // put a toast if commands fail
         if (
@@ -494,6 +500,35 @@ export const useSettingsPage = () => {
     }
   };
 
+  const [visibleButtons, setVisibleButtons] = useState<VisibleButtons>({
+    favorite: true,
+    photographed: true,
+    shared: true,
+  });
+
+  const handleVisibleButtonsChange = async (key: keyof VisibleButtons, value: boolean) => {
+    try {
+      const newVisibleButtons = { ...visibleButtons, [key]: value };
+      info(`Setting visible buttons: ${JSON.stringify(newVisibleButtons)}`);
+      const result = await commands.setVisibleButtons(newVisibleButtons);
+
+      if (result.status === 'ok') {
+        setVisibleButtons(newVisibleButtons);
+        info(`Visible buttons set: ${key}=${value}`);
+      } else {
+        error(`Failed to set visible buttons: ${result.error}`);
+        toast(t('general:error-title'), {
+          description: t('settings-page:error-save-preferences') + ': ' + result.error,
+        });
+      }
+    } catch (e) {
+      error(`Failed to save visible buttons: ${e}`);
+      toast(t('general:error-title'), {
+        description: t('settings-page:error-save-preferences'),
+      });
+    }
+  };
+
   return {
     cardSize,
     language,
@@ -523,6 +558,8 @@ export const useSettingsPage = () => {
     defaultInstanceType,
     openHiddenFolder,
     handleNativeExport,
+    visibleButtons,
+    handleVisibleButtonsChange,
     t,
   };
 };

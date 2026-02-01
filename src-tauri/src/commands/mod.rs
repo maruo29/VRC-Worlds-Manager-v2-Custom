@@ -69,6 +69,8 @@ pub fn generate_tauri_specta_builder() -> Builder<tauri::Wry> {
         preferences_commands::set_sort_preferences,
         preferences_commands::get_default_instance_type,
         preferences_commands::set_default_instance_type,
+        preferences_commands::get_visible_buttons,
+        preferences_commands::set_visible_buttons,
         api_commands::try_login,
         api_commands::login_with_credentials,
         api_commands::login_with_2fa,
