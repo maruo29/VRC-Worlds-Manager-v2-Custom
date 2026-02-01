@@ -1,4 +1,4 @@
-# VRC Worlds Manager V2 - Custom Edition v1.3.0-4
+# VRC Worlds Manager V2 - Custom Edition v1.3.0-5
 
 このリリースは、本家の VRC Worlds Manager V2 をベースに、独自の拡張機能と改善を加えたカスタムバージョンです。
 
