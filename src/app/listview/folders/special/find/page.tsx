@@ -93,15 +93,57 @@ export default function FindWorldsPage() {
 
   const { importFolder } = useFolders();
 
+  // Fetch all local worlds to map status
+  const [localWorldsMap, setLocalWorldsMap] = useState<Map<string, WorldDisplayData>>(new Map());
+
+  // Function to refresh local worlds map and return it
+  const refreshLocalWorldsMap = useCallback(async () => {
+    try {
+      const result = await commands.getAllWorlds();
+      if (result.status === 'ok') {
+        const map = new Map<string, WorldDisplayData>();
+        result.data.forEach((w) => map.set(w.worldId, w));
+        setLocalWorldsMap(map);
+        return map;
+      }
+    } catch (e) {
+      error(`Failed to fetch local worlds for mapping: ${e}`);
+    }
+    return new Map<string, WorldDisplayData>();
+  }, []);
+
+  // Initial fetch of local worlds
+  useEffect(() => {
+    refreshLocalWorldsMap();
+  }, [refreshLocalWorldsMap]);
+
   const fetchRecentlyVisitedWorlds = useCallback(async () => {
     try {
       setIsLoading(true);
+      // Ensure we have fresh local data before merging
+      const currentMap = await refreshLocalWorldsMap();
+
       const worlds = await commands.getRecentlyVisitedWorlds();
       if (worlds.status !== 'ok') {
         throw new Error(worlds.error);
       } else {
         info(`Fetched recently visited worlds: ${worlds.data.length}`);
-        setRecentlyVisitedWorlds(worlds.data);
+
+        // Merge local data (tags, favorite status, etc.)
+        const mergedWorlds = worlds.data.map((world) => {
+          const localData = currentMap.get(world.worldId);
+          if (localData) {
+            return {
+              ...world,
+              folders: localData.folders,
+              isFavorite: localData.isFavorite,
+              isPhotographed: localData.isPhotographed,
+            };
+          }
+          return world;
+        });
+
+        setRecentlyVisitedWorlds(mergedWorlds);
       }
       toast(t('find-page:fetch-recently-visited-worlds'), {
         description: t(
@@ -115,7 +157,7 @@ export default function FindWorldsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [t]);
+  }, [t, refreshLocalWorldsMap]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -178,6 +220,9 @@ export default function FindWorldsPage() {
 
   // Fetch recently visited worlds on initial load
   useEffect(() => {
+    // Only fetch if empty and not loading. 
+    // Optimization: Also could check if we have map loaded?
+    // refreshLocalWorldsMap is called in fetchRecentlyVisitedWorlds anyway.
     if (recentlyVisitedWorlds.length === 0 && !isLoading) {
       fetchRecentlyVisitedWorlds();
     }
@@ -247,7 +292,8 @@ export default function FindWorldsPage() {
 
       if (result.status === 'ok') {
         info(`Auto-search results: ${result.data.length} worlds found`);
-        setSearchResults(result.data);
+        const processedData = result.data; // Note: Auto-search also needs merging if desired, but less criticial for initial load
+        setSearchResults(processedData);
         setHasMoreResults(result.data.length > 0);
 
         if (result.data.length === 0) {
@@ -274,9 +320,12 @@ export default function FindWorldsPage() {
       return;
     }
 
+    let currentMap = localWorldsMap;
     if (!loadMore) {
       // Only set this flag when performing a new search, not when loading more
       setHasSearched(true);
+      // Refresh local map on new search to be fresh, and wait for it
+      currentMap = await refreshLocalWorldsMap();
     }
 
     if (loadMore) {
@@ -301,14 +350,35 @@ export default function FindWorldsPage() {
 
       if (result.status === 'ok') {
         info(`Search results: ${result.data.length} worlds found`);
+
+        const processResults = (worlds: WorldDisplayData[]) => {
+          return worlds.map((world) => {
+            const localData = currentMap.get(world.worldId);
+            if (localData) {
+              return {
+                ...world,
+                folders: localData.folders,
+                isFavorite: localData.isFavorite,
+                isPhotographed: localData.isPhotographed,
+                // prefer local data for mutable fields if needed, 
+                // but search result might be more up to date for visits/etc.
+                // keeping search result metadata but overlaying user status
+              };
+            }
+            return world;
+          });
+        };
+
+        const processedData = processResults(result.data);
+
         if (loadMore) {
           // Append new results to existing ones
-          setSearchResults((prev) => [...prev, ...result.data]);
+          setSearchResults((prev) => [...prev, ...processedData]);
           setCurrentPage(currentPage + 1);
           setLoadMoreBackoffUntil(null); // reset backoff after success
         } else {
           // Replace results for new search
-          setSearchResults(result.data);
+          setSearchResults(processedData);
           setCurrentPage(1);
         }
 
@@ -472,6 +542,22 @@ export default function FindWorldsPage() {
                 worlds={recentlyVisitedWorlds}
                 currentFolder={SpecialFolders.Find}
                 containerRef={findGridRef}
+                onWorldUpdate={(worldId, updates) => {
+                  setRecentlyVisitedWorlds((prev) =>
+                    prev.map((w) => (w.worldId === worldId ? { ...w, ...updates } : w)),
+                  );
+                  setLocalWorldsMap((prevMap) => {
+                    const newMap = new Map(prevMap);
+                    const existing = newMap.get(worldId);
+                    if (existing) {
+                      newMap.set(worldId, { ...existing, ...updates });
+                    } else {
+                      // Should we add it if not found?
+                      // If favorited, maybe?
+                    }
+                    return newMap;
+                  });
+                }}
               />
             ) : (
               <div className="flex flex-col items-center justify-center h-64">
@@ -643,58 +729,67 @@ export default function FindWorldsPage() {
             <div className="flex flex-col gap-4 p-4">
               {/* original search tab content */}
               {/* Search results */}
-              {isSearching && searchResults.length === 0 && (
-                <WorldGridSkeleton />
-              )}
-
-              {searchResults.length > 0 && (
-                <div className="flex-1">
-                  <WorldGrid
-                    worlds={searchResults}
-                    currentFolder={SpecialFolders.Find}
-                    containerRef={findGridRef}
-                  />
-
-                  {/* Load more indicator */}
-                  <div ref={loadMoreRef} className="p-4 flex justify-center">
-                    {isLoadingMore ? (
-                      <div className="w-full max-w-screen-lg">
-                        <WorldGridSkeleton count={6} />
-                      </div>
-                    ) : hasMoreResults ? (
-                      <p className="text-sm text-muted-foreground">
-                        {t('find-page:scroll-for-more')}
-                      </p>
-                    ) : (
-                      searchResults.length > 0 && (
-                        <p className="text-sm text-muted-foreground">
-                          {t('find-page:no-more-results')}
-                        </p>
-                      )
-                    )}
+              <div className="flex-1 flex flex-col overflow-hidden">
+                {hasSearched && searchResults.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-8 text-center">
+                    <Search className="w-12 h-12 mb-4 opacity-20" />
+                    <p className="text-lg font-medium">{t('listview-page:no-search-results')}</p>
+                    <p className="text-sm mt-2">{t('listview-page:try-different-keywords')}</p>
                   </div>
-                </div>
-              )}
+                ) : !hasSearched && searchResults.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-8 text-center">
+                    <Search className="w-12 h-12 mb-4 opacity-20" />
+                    <p className="text-lg font-medium">{t('listview-page:start-search-title')}</p>
+                    <p className="text-sm mt-2">{t('listview-page:start-search-description')}</p>
+                  </div>
+                ) : (
+                  <>
+                    {isSearching && searchResults.length === 0 && (
+                      <WorldGridSkeleton />
+                    )}
+                    {searchResults.length > 0 && (
+                      <>
+                        <WorldGrid
+                          worlds={searchResults}
+                          currentFolder={SpecialFolders.Find}
+                          containerRef={findGridRef}
+                          onWorldUpdate={(worldId, updates) => {
+                            setSearchResults((prev) =>
+                              prev.map((w) => (w.worldId === worldId ? { ...w, ...updates } : w)),
+                            );
+                            setLocalWorldsMap((prevMap) => {
+                              const newMap = new Map(prevMap);
+                              const existing = newMap.get(worldId);
+                              if (existing) {
+                                newMap.set(worldId, { ...existing, ...updates });
+                              }
+                              return newMap;
+                            });
+                          }}
+                        />
 
-              {/* No results state - only show when a search has been performed */}
-              {!isSearching && searchResults.length === 0 && hasSearched && (
-                <div className="flex flex-col items-center justify-center h-64 text-center">
-                  <Search className="h-12 w-12 text-muted-foreground mb-2" />
-                  <p className="text-muted-foreground">
-                    {t('find-page:no-search-results')}
-                  </p>
-                </div>
-              )}
-
-              {/* Initial state - show either when no search has been performed or when search query is empty */}
-              {!isSearching && searchResults.length === 0 && !hasSearched && (
-                <div className="flex flex-col items-center justify-center h-64 text-center">
-                  <Search className="h-12 w-12 text-muted-foreground mb-2" />
-                  <p className="text-muted-foreground">
-                    {t('find-page:search-instructions')}
-                  </p>
-                </div>
-              )}
+                        <div ref={loadMoreRef} className="p-4 flex justify-center shrink-0">
+                          {isLoadingMore ? (
+                            <div className="w-full max-w-screen-lg">
+                              <WorldGridSkeleton count={6} />
+                            </div>
+                          ) : hasMoreResults ? (
+                            <p className="text-sm text-muted-foreground">
+                              {t('find-page:scroll-for-more')}
+                            </p>
+                          ) : (
+                            searchResults.length > 0 && (
+                              <p className="text-sm text-muted-foreground">
+                                {t('find-page:no-more-results')}
+                              </p>
+                            )
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
           </div>
         )}

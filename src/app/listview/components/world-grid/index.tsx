@@ -36,6 +36,7 @@ interface WorldGridProps {
   // Optional interaction flags for special embeds (e.g., selection-only dialog)
   disableCardClick?: boolean;
   alwaysShowSelection?: boolean;
+  onWorldUpdate?: (worldId: string, updates: Partial<WorldDisplayData>) => void;
 }
 
 export function WorldGrid({
@@ -44,6 +45,7 @@ export function WorldGrid({
   currentFolder,
   disableCardClick = false,
   alwaysShowSelection = false,
+  onWorldUpdate,
 }: WorldGridProps) {
   const { t } = useLocalization();
 
@@ -71,7 +73,7 @@ export function WorldGrid({
     handleSetPhotographed,
     handleSetShared,
     visibleButtons,
-  } = useWorldGrid(currentFolder, worlds);
+  } = useWorldGrid(currentFolder, worlds, onWorldUpdate);
 
   const gap = 16;
   const cardWidths: Record<CardSize, number> = {

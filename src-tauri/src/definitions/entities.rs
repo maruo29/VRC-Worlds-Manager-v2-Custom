@@ -311,7 +311,7 @@ impl Default for VisibleButtons {
         Self {
             favorite: true,
             photographed: true,
-            shared: true,
+            shared: false,
         }
     }
 }
@@ -358,7 +358,7 @@ fn default_region() -> InstanceRegion {
 }
 
 fn default_folder_removal() -> FolderRemovalPreference {
-    FolderRemovalPreference::Ask
+    FolderRemovalPreference::NeverRemove
 }
 
 fn default_update_channel() -> UpdateChannel {

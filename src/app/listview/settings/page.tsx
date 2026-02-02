@@ -455,34 +455,7 @@ export default function SettingsPage() {
             </Button>
           </Card>
 
-          <Card className="flex flex-row items-center justify-between p-4 rounded-lg border">
-            <div className="flex flex-col space-y-1.5">
-              <Label className="text-base font-medium">
-                {t('settings-page:update-channel-title')}
-              </Label>
-              <div className="text-sm text-muted-foreground">
-                {t('settings-page:update-channel-description')}
-              </div>
-            </div>
-            <Select
-              value={updateChannel || 'Release'}
-              onValueChange={(value: string) =>
-                handleUpdateChannelChange(value as UpdateChannel)
-              }
-            >
-              <SelectTrigger className="w-fit px-2">
-                <SelectValue placeholder="Update Channel" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="stable">
-                  {t('settings-page:update-channel-stable')}
-                </SelectItem>
-                <SelectItem value="pre-release">
-                  {t('settings-page:update-channel-prerelease')}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </Card>
+
 
           <Card className="flex flex-row items-center justify-between p-4 rounded-lg border">
             <div className="flex flex-col space-y-1.5">

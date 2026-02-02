@@ -70,13 +70,13 @@ export function AddToFolderDialog({
           <DialogDescription>
             {selectedWorlds?.length === 1
               ? t(
-                  'add-to-folder-dialog:description-single',
-                  selectedWorlds.length,
-                )
+                'add-to-folder-dialog:description-single',
+                selectedWorlds.length,
+              )
               : t(
-                  'add-to-folder-dialog:description-multiple',
-                  selectedWorlds?.length,
-                )}
+                'add-to-folder-dialog:description-multiple',
+                selectedWorlds?.length,
+              )}
           </DialogDescription>
         </DialogHeader>
 
@@ -100,9 +100,8 @@ export function AddToFolderDialog({
                       key={folder.name}
                       data-folder={folder.name}
                       variant={isAll ? 'default' : 'outline'}
-                      className={`w-full justify-between group ${
-                        isAll ? '' : ''
-                      }`}
+                      className={`w-full justify-between group ${isAll ? '' : ''
+                        }`}
                       onClick={() => handleClick(folder.name)}
                     >
                       <span className="flex flex-row items-center w-full justify-start">
@@ -110,9 +109,8 @@ export function AddToFolderDialog({
                           {folder.world_count}
                         </span>
                         <span
-                          className={`truncate flex-1 pr-2 text-left max-w-[290px] ${
-                            isAll ? 'font-medium' : ''
-                          }`}
+                          className={`truncate flex-1 pr-2 text-left max-w-[290px] ${isAll ? 'font-medium' : ''
+                            }`}
                         >
                           {folder.name}
                         </span>
@@ -124,6 +122,19 @@ export function AddToFolderDialog({
                     </Button>
                   );
                 })}
+
+                {/* Add Folder Button (Inside ScrollArea, at the end of list) */}
+                {!isCreatingNew && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsCreatingNew(true)}
+                    disabled={isLoading}
+                    className="w-full justify-start pl-2"
+                  >
+                    + {t('add-to-folder-dialog:add-folder')}
+                  </Button>
+                )}
 
                 {isCreatingNew && (
                   <Input
@@ -157,18 +168,7 @@ export function AddToFolderDialog({
               </div>
             </ScrollArea>
 
-            {/* add‐folder toggle button */}
-            <div className="mt-2 px-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsCreatingNew(true)}
-                disabled={isLoading || isCreatingNew}
-                className="w-full"
-              >
-                + {t('add-to-folder-dialog:add-folder')}
-              </Button>
-            </div>
+
 
             {/* Info card for Find Page */}
             {isFindPage && (

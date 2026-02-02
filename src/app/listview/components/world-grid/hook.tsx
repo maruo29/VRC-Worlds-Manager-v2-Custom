@@ -15,6 +15,7 @@ import { FolderType, isUserFolder, SpecialFolders } from '@/types/folders';
 export function useWorldGrid(
   currentFolder: FolderType,
   worlds: WorldDisplayData[],
+  onWorldUpdate?: (worldId: string, updates: Partial<WorldDisplayData>) => void,
 ) {
   const { t } = useLocalization();
   const setPopup = usePopupStore((state) => state.setPopup);
@@ -368,6 +369,8 @@ export function useWorldGrid(
   const handleSetPhotographed = async (worldId: string, isPhotographed: boolean) => {
     // Optimistic update - instantly update UI in both stores
     useWorldsStore.getState().updateWorldProperty(worldId, { isPhotographed });
+    onWorldUpdate?.(worldId, { isPhotographed });
+
     // Also update filteredWorlds for immediate UI refresh
     const currentFiltered = useWorldFiltersStore.getState().filteredWorlds;
     useWorldFiltersStore.getState().setFilteredWorlds(
@@ -378,6 +381,8 @@ export function useWorldGrid(
     } catch (e) {
       // Revert on error
       useWorldsStore.getState().updateWorldProperty(worldId, { isPhotographed: !isPhotographed });
+      onWorldUpdate?.(worldId, { isPhotographed: !isPhotographed });
+
       useWorldFiltersStore.getState().setFilteredWorlds(
         useWorldFiltersStore.getState().filteredWorlds.map((w) =>
           w.worldId === worldId ? { ...w, isPhotographed: !isPhotographed } : w
@@ -393,6 +398,8 @@ export function useWorldGrid(
   const handleSetShared = async (worldId: string, isShared: boolean) => {
     // Optimistic update - instantly update UI in both stores
     useWorldsStore.getState().updateWorldProperty(worldId, { isShared });
+    onWorldUpdate?.(worldId, { isShared });
+
     // Also update filteredWorlds for immediate UI refresh
     const currentFiltered = useWorldFiltersStore.getState().filteredWorlds;
     useWorldFiltersStore.getState().setFilteredWorlds(
@@ -403,6 +410,8 @@ export function useWorldGrid(
     } catch (e) {
       // Revert on error
       useWorldsStore.getState().updateWorldProperty(worldId, { isShared: !isShared });
+      onWorldUpdate?.(worldId, { isShared: !isShared });
+
       useWorldFiltersStore.getState().setFilteredWorlds(
         useWorldFiltersStore.getState().filteredWorlds.map((w) =>
           w.worldId === worldId ? { ...w, isShared: !isShared } : w
@@ -418,6 +427,8 @@ export function useWorldGrid(
   const handleSetFavorite = async (worldId: string, isFavorite: boolean) => {
     // Optimistic update - instantly update UI in both stores
     useWorldsStore.getState().updateWorldProperty(worldId, { isFavorite });
+    onWorldUpdate?.(worldId, { isFavorite });
+
     // Also update filteredWorlds for immediate UI refresh
     const currentFiltered = useWorldFiltersStore.getState().filteredWorlds;
     useWorldFiltersStore.getState().setFilteredWorlds(
@@ -428,6 +439,8 @@ export function useWorldGrid(
     } catch (e) {
       // Revert on error
       useWorldsStore.getState().updateWorldProperty(worldId, { isFavorite: !isFavorite });
+      onWorldUpdate?.(worldId, { isFavorite: !isFavorite });
+
       useWorldFiltersStore.getState().setFilteredWorlds(
         useWorldFiltersStore.getState().filteredWorlds.map((w) =>
           w.worldId === worldId ? { ...w, isFavorite: !isFavorite } : w
