@@ -194,6 +194,9 @@ export function RestoreBackupDialog({
                     <br />
                     {t('settings-page:warning-text-2')}
                   </p>
+                  <p className="text-sm font-bold text-red-600 dark:text-red-400 mt-2">
+                    {t('settings-page:warning-restart-required')}
+                  </p>
                 </div>
               </div>
             </>

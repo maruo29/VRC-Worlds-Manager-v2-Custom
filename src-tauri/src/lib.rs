@@ -14,7 +14,6 @@ use crate::services::memo_manager::MemoManager;
 use crate::task::cancellable_task::TaskContainer;
 use crate::task::definitions::TaskStatusChanged;
 
-
 mod api;
 mod backup;
 mod changelog;
@@ -40,8 +39,7 @@ pub struct StartupDeepLink(pub std::sync::Mutex<Option<String>>);
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let builder =
-        generate_tauri_specta_builder().events(collect_events![TaskStatusChanged]);
+    let builder = generate_tauri_specta_builder().events(collect_events![TaskStatusChanged]);
 
     #[cfg(debug_assertions)]
     builder
@@ -53,11 +51,10 @@ pub fn run() {
         )
         .expect("Failed to export typescript bindings");
 
-    let mut tauri_builder = tauri::Builder::default();
+    let mut tauri_builder = tauri::Builder::default().plugin(tauri_plugin_process::init());
 
     #[cfg(desktop)]
     {
-
         tauri_builder =
             tauri_builder.plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
                 let window = app.get_webview_window("main").expect("no main window");
@@ -68,11 +65,11 @@ pub fn run() {
                 let _ = window.unminimize();
                 let _ = window.show();
                 let _ = window.set_focus();
-                
+
                 // Reset always on top after a short delay or immediately
-                // Immediate reset might be too fast for the OS to switch z-order, 
+                // Immediate reset might be too fast for the OS to switch z-order,
                 // but let's try setting it back to false after a slight delay in a separate thread if needed.
-                // For now, let's just leave it true for a moment then false? 
+                // For now, let's just leave it true for a moment then false?
                 // Actually, just setting it true then false immediately often works.
                 let _ = window.set_always_on_top(false);
 
@@ -80,7 +77,7 @@ pub fn run() {
 
                 // Emitting all args to frontend to handle logic there
                 if !args.is_empty() {
-                     let _ = app.emit("deep-link-received", args.clone());
+                    let _ = app.emit("deep-link-received", args.clone());
                 }
             }));
     }
@@ -88,7 +85,6 @@ pub fn run() {
     tauri_builder = tauri_builder.plugin(tauri_plugin_deep_link::init());
 
     tauri_builder
-
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
@@ -148,8 +144,6 @@ pub fn run() {
                 log::error!("Failed to initialize app: {}", e);
             }
 
-
-
             Ok(())
         })
         .run(tauri::generate_context!())
@@ -192,5 +186,3 @@ fn initialize_app() -> Result<(), String> {
         }
     }
 }
-
-

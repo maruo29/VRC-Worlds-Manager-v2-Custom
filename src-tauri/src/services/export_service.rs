@@ -177,13 +177,48 @@ impl ExportService {
             return Err("Target directory does not exist".to_string());
         }
 
+        // Create timestamped folder
+        let timestamp = chrono::Local::now().format("%Y-%m-%d_%H-%M-%S").to_string();
+        let export_folder_name = format!("VRC_Worlds_Manager_Export_{}", timestamp);
+        let export_path = target.join(export_folder_name);
+
+        fs::create_dir_all(&export_path)
+            .map_err(|e| format!("Failed to create export folder: {}", e))?;
+
         // Copy worlds.json
-        let target_worlds = target.join("worlds.json");
-        fs::copy(&worlds_path, target_worlds).map_err(|e| format!("Failed to copy worlds.json: {}", e))?;
+        let target_worlds = export_path.join("worlds.json");
+        fs::copy(&worlds_path, &target_worlds)
+            .map_err(|e| format!("Failed to copy worlds.json: {}", e))?;
 
         // Copy folders.json
-        let target_folders = target.join("folders.json");
-        fs::copy(&folders_path, target_folders).map_err(|e| format!("Failed to copy folders.json: {}", e))?;
+        let target_folders = export_path.join("folders.json");
+        fs::copy(&folders_path, &target_folders)
+            .map_err(|e| format!("Failed to copy folders.json: {}", e))?;
+
+        // Generate backup_info.json
+        // We need to read the files to count items
+        let worlds_content = fs::read_to_string(&worlds_path)
+            .map_err(|e| format!("Failed to read worlds.json for metadata: {}", e))?;
+        let folders_content = fs::read_to_string(&folders_path)
+            .map_err(|e| format!("Failed to read folders.json for metadata: {}", e))?;
+
+        let worlds: Vec<serde_json::Value> = serde_json::from_str(&worlds_content)
+            .map_err(|e| format!("Failed to parse worlds.json: {}", e))?;
+        let folders: Vec<serde_json::Value> = serde_json::from_str(&folders_content)
+            .map_err(|e| format!("Failed to parse folders.json: {}", e))?;
+
+        let info = crate::backup::BackupMetaData {
+            date: timestamp,
+            number_of_folders: folders.len() as u32,
+            number_of_worlds: worlds.len() as u32,
+            app_version: env!("CARGO_PKG_VERSION").to_string(),
+        };
+
+        let info_path = export_path.join("backup_info.json");
+        let file = std::fs::File::create(&info_path)
+            .map_err(|e| format!("Failed to create backup_info.json: {}", e))?;
+        serde_json::to_writer_pretty(file, &info)
+            .map_err(|e| format!("Failed to write backup_info.json: {}", e))?;
 
         Ok(())
     }

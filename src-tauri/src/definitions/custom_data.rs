@@ -11,15 +11,23 @@ pub struct CustomData {
     /// Version of the custom data format for future migrations
     #[serde(default = "default_version")]
     pub version: u32,
-    
+
     /// Map of world_id -> is_favorite status
     #[serde(rename = "worldFavorites", default)]
     pub world_favorites: HashMap<String, bool>,
-    
+
     /// Map of folder_name -> color (hex string like "#a855f7")
     #[serde(rename = "folderColors", default)]
     pub folder_colors: HashMap<String, String>,
-    
+
+    /// Map of world_id -> is_photographed status
+    #[serde(rename = "worldPhotographed", default)]
+    pub world_photographed: HashMap<String, bool>,
+
+    /// Map of world_id -> is_shared status
+    #[serde(rename = "worldShared", default)]
+    pub world_shared: HashMap<String, bool>,
+
     /// Extended preferences
     #[serde(default)]
     pub preferences: CustomPreferences,
@@ -34,6 +42,14 @@ pub struct CustomPreferences {
     /// Default instance type for creating instances
     #[serde(rename = "defaultInstanceType", default)]
     pub default_instance_type: DefaultInstanceType,
+
+    /// Visible buttons settings
+    #[serde(rename = "visibleButtons", default, skip_serializing_if = "Option::is_none")]
+    pub visible_buttons: Option<crate::definitions::VisibleButtons>,
+
+    /// Dont show remove from folder preference
+    #[serde(rename = "dontShowRemoveFromFolder", default, skip_serializing_if = "Option::is_none")]
+    pub dont_show_remove_from_folder: Option<crate::definitions::FolderRemovalPreference>,
 }
 
 impl CustomData {
@@ -42,10 +58,43 @@ impl CustomData {
             version: 1,
             world_favorites: HashMap::new(),
             folder_colors: HashMap::new(),
+            world_photographed: HashMap::new(),
+            world_shared: HashMap::new(),
             preferences: CustomPreferences::default(),
         }
     }
-    
+
+    /// Sets the photographed status for a world
+    pub fn set_world_photographed(&mut self, world_id: &str, is_photographed: bool) {
+        if is_photographed {
+            self.world_photographed.insert(world_id.to_string(), true);
+        } else {
+            self.world_photographed.remove(world_id);
+        }
+    }
+
+    /// Gets the photographed status for a world
+    pub fn is_world_photographed(&self, world_id: &str) -> bool {
+        self.world_photographed
+            .get(world_id)
+            .copied()
+            .unwrap_or(false)
+    }
+
+    /// Sets the shared status for a world
+    pub fn set_world_shared(&mut self, world_id: &str, is_shared: bool) {
+        if is_shared {
+            self.world_shared.insert(world_id.to_string(), true);
+        } else {
+            self.world_shared.remove(world_id);
+        }
+    }
+
+    /// Gets the shared status for a world
+    pub fn is_world_shared(&self, world_id: &str) -> bool {
+        self.world_shared.get(world_id).copied().unwrap_or(false)
+    }
+
     /// Sets the favorite status for a world
     pub fn set_world_favorite(&mut self, world_id: &str, is_favorite: bool) {
         if is_favorite {
@@ -54,36 +103,37 @@ impl CustomData {
             self.world_favorites.remove(world_id);
         }
     }
-    
+
     /// Gets the favorite status for a world
     pub fn is_world_favorite(&self, world_id: &str) -> bool {
         self.world_favorites.get(world_id).copied().unwrap_or(false)
     }
-    
+
     /// Sets the color for a folder
     pub fn set_folder_color(&mut self, folder_name: &str, color: Option<&str>) {
         match color {
             Some(c) => {
-                self.folder_colors.insert(folder_name.to_string(), c.to_string());
+                self.folder_colors
+                    .insert(folder_name.to_string(), c.to_string());
             }
             None => {
                 self.folder_colors.remove(folder_name);
             }
         }
     }
-    
+
     /// Gets the color for a folder
     pub fn get_folder_color(&self, folder_name: &str) -> Option<&String> {
         self.folder_colors.get(folder_name)
     }
-    
+
     /// Renames a folder in the color map (used when folder is renamed)
     pub fn rename_folder(&mut self, old_name: &str, new_name: &str) {
         if let Some(color) = self.folder_colors.remove(old_name) {
             self.folder_colors.insert(new_name.to_string(), color);
         }
     }
-    
+
     /// Removes a folder from the color map (used when folder is deleted)
     pub fn remove_folder(&mut self, folder_name: &str) {
         self.folder_colors.remove(folder_name);

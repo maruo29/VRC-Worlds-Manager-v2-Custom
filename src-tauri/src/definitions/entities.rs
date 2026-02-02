@@ -74,9 +74,9 @@ pub struct WorldUserData {
     #[serde(skip)]
     pub folders: Vec<String>,
     pub hidden: bool,
-    #[serde(default)]
+    #[serde(default, skip)]
     pub is_photographed: bool,
-    #[serde(default)]
+    #[serde(default, skip)]
     pub is_shared: bool,
     /// Favorite status - stored in custom_data.json for backward compatibility
     #[serde(skip)]
@@ -327,13 +327,13 @@ pub struct PreferenceModel {
     #[serde(default = "default_region")]
     pub region: InstanceRegion,
     #[serde(
-        rename = "filterItemSelectorStarred",
         skip_serializing_if = "Option::is_none"
     )]
     pub filter_item_selector_starred: Option<FilterItemSelectorStarred>,
     #[serde(
         rename = "dontShowRemoveFromFolder",
-        default = "default_folder_removal"
+        default = "default_folder_removal",
+        skip
     )]
     pub dont_show_remove_from_folder: FolderRemovalPreference,
     #[serde(rename = "updateChannel", default = "default_update_channel")]
@@ -345,7 +345,7 @@ pub struct PreferenceModel {
     /// Default instance type - stored in custom_data.json for backward compatibility
     #[serde(skip)]
     pub default_instance_type: DefaultInstanceType,
-    #[serde(rename = "visibleButtons", default = "default_visible_buttons")]
+    #[serde(rename = "visibleButtons", default = "default_visible_buttons", skip)]
     pub visible_buttons: VisibleButtons,
 }
 

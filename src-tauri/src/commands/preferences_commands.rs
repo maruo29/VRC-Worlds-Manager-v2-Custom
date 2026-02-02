@@ -263,7 +263,7 @@ pub fn set_default_instance_type(instance_type: DefaultInstanceType) -> Result<(
     let mut preferences_lock = PREFERENCES.get().write();
     let preferences = preferences_lock.as_mut().unwrap();
     preferences.default_instance_type = instance_type.clone();
-    
+
     // Write to custom_data.json for backward compatibility
     let mut custom_data = FileService::read_custom_data();
     custom_data.preferences.default_instance_type = instance_type;
@@ -284,7 +284,9 @@ pub fn get_visible_buttons() -> Result<crate::definitions::VisibleButtons, Strin
 
 #[tauri::command]
 #[specta::specta]
-pub fn set_visible_buttons(visible_buttons: crate::definitions::VisibleButtons) -> Result<(), String> {
+pub fn set_visible_buttons(
+    visible_buttons: crate::definitions::VisibleButtons,
+) -> Result<(), String> {
     let mut preferences_lock = PREFERENCES.get().write();
     let preferences = preferences_lock.as_mut().unwrap();
     preferences.visible_buttons = visible_buttons;

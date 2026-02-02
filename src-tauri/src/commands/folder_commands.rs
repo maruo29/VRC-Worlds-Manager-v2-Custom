@@ -18,7 +18,10 @@ pub async fn add_world_to_folder(folder_name: String, world_id: String) -> Resul
 
 #[tauri::command]
 #[specta::specta]
-pub async fn add_worlds_to_folder(folder_name: String, world_ids: Vec<String>) -> Result<(), String> {
+pub async fn add_worlds_to_folder(
+    folder_name: String,
+    world_ids: Vec<String>,
+) -> Result<(), String> {
     match FolderManager::add_worlds_to_folder(folder_name, world_ids, FOLDERS.get(), WORLDS.get()) {
         Ok(_) => Ok(()),
         Err(e) => {

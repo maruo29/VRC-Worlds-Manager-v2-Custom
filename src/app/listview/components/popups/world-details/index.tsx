@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle, ExternalLink, Pencil } from 'lucide-react';
+import { AlertCircle, ExternalLink, Pencil, Plus } from 'lucide-react';
 import QPc from '@/../public/icons/VennColorQPc.svg';
 import QPcQ from '@/../public/icons/VennColorQPcQ.svg';
 import QQ from '@/../public/icons/VennColorQQ.svg';
@@ -1045,6 +1045,15 @@ export function WorldDetailPopup({
                                 {t('general:no-folders')}
                               </span>
                             )}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="w-full justify-start pl-0 gap-2 h-8 text-muted-foreground hover:text-foreground"
+                              onClick={() => setPopup('showCreateFolder', true)}
+                            >
+                              <Plus className="h-4 w-4" />
+                              <span className="text-sm">{t('app-sidebar:add-folder')}</span>
+                            </Button>
                           </div>
                         </div>
                       </div>

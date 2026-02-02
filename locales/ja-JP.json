@@ -1,5 +1,6 @@
 {
   "general:loading": "読み込み中...",
+  "general:no-folders": "フォルダがありません",
   "general:worlds-data": "ワールドデータ",
   "general:folders-data": "フォルダデータ",
   "general:migrating": "移行中...",
@@ -156,7 +157,7 @@
   "listview-page:error-delete-world": "ワールドの削除に失敗しました",
   "listview-page:active-filters": "適用中のフィルタ",
   "listview-page:items-hidden": "他 {0} 件",
-  "listview-page:no-worlds-all": "まだワールドがありません。「お気に入りを取得」ボタンをクリックして、お気に入りのワールドを取得しましょう！",
+  "listview-page:no-worlds-all": "まだワールドがありません。「ワールドを探す」からワールドを追加してください。",
   "listview-page:no-worlds-unclassified": "すべてのワールドがフォルダに入っているか、まだワールドがありません。",
   "listview-page:no-worlds-in-folder": "ワールドを右クリックするか「ワールドを追加」ボタンで新しいワールドを追加できます。",
   "listview-page:no-worlds": "ワールドが見つかりません。",
@@ -305,6 +306,7 @@
   "settings-page:error-export-data": "エクスポート失敗",
   "settings-page:warning-text-1": "現在のデータが上書きされます。",
   "settings-page:warning-text-2": "事前にバックアップを取ることをお勧めします。",
+  "settings-page:warning-restart-required": "※設定が反映されるにはアプリの再起動が必要です。",
   "settings-page:restore-confirm": "バックアップを復元",
   "settings-page:error-read-backup": "無効なバックアップフォルダまたはメタデータ",
   "settings-page:backup-success-title": "バックアップ作成完了",

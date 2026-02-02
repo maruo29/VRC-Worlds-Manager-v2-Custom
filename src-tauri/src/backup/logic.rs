@@ -1,8 +1,8 @@
 use crate::backup::BackupMetaData;
+use crate::definitions::CustomData;
 use crate::services::FileService;
 use crate::FolderModel;
 use crate::WorldModel;
-use crate::definitions::CustomData;
 use chrono::Utc;
 use log;
 use std::fs::{self, File};
@@ -67,11 +67,11 @@ pub fn restore_from_backup(
         let custom_data_path = backup_dir.join("custom_data.json");
         if custom_data_path.exists() {
             log::info!("Found custom_data.json in backup, restoring...");
-             let file = File::open(&custom_data_path).map_err(|e| e.to_string())?;
+            let file = File::open(&custom_data_path).map_err(|e| e.to_string())?;
             let reader = BufReader::new(file);
             let custom_data: CustomData = serde_json::from_reader(reader)
                 .map_err(|e| format!("Failed to parse custom_data.json: {}", e))?;
-            
+
             FileService::write_custom_data(&custom_data).map_err(|e| e.to_string())?;
             log::info!("Restored custom_data.json");
 
@@ -81,7 +81,7 @@ pub fn restore_from_backup(
                     log::error!("Failed to acquire write lock for folders: {}", e);
                     "Failed to acquire write lock for folders".to_string()
                 })?;
-                
+
                 for folder in folders_lock.iter_mut() {
                     if let Some(color) = custom_data.get_folder_color(&folder.folder_name) {
                         folder.color = Some(color.clone());
@@ -90,15 +90,14 @@ pub fn restore_from_backup(
                 log::info!("Applied folder colors from custom_data to in-memory folders");
             }
         } else {
-             // If custom_data.json doesn't exist in backup, we might want to clear existing custom data
-             // or keep it as is. For safety, let's keep it as is, or reset to default if full restore is implied.
-             // Given this is a restore operation, maybe we should respect the backup state. 
-             // If the backup has no custom_data, it means it's an old backup or from original V2.
-             // In that case, maybe we should create a default custom_data?
-             // For now, let's just log it.
-             log::info!("No custom_data.json found in backup.");
+            // If custom_data.json doesn't exist in backup, we might want to clear existing custom data
+            // or keep it as is. For safety, let's keep it as is, or reset to default if full restore is implied.
+            // Given this is a restore operation, maybe we should respect the backup state.
+            // If the backup has no custom_data, it means it's an old backup or from original V2.
+            // In that case, maybe we should create a default custom_data?
+            // For now, let's just log it.
+            log::info!("No custom_data.json found in backup.");
         }
-
     } else {
         log::error!("Backup files not found in the specified path");
         return Err("Backup files not found in the specified path".to_string());

@@ -19,7 +19,11 @@ pub struct FolderData {
 
 impl FolderData {
     pub fn new(name: String, world_count: u16, color: Option<String>) -> Self {
-        Self { name, world_count, color }
+        Self {
+            name,
+            world_count,
+            color,
+        }
     }
 }
 
@@ -106,9 +110,9 @@ impl FolderManager {
         let folder = folders_lock
             .iter_mut()
             .find(|f| f.folder_name == folder_name);
-        
+
         if folder.is_none() {
-             return Err(EntityError::FolderNotFound(folder_name).into());
+            return Err(EntityError::FolderNotFound(folder_name).into());
         }
         let folder = folder.unwrap();
 
@@ -149,7 +153,7 @@ impl FolderManager {
         let world = worlds_lock
             .iter_mut()
             .find(|w| w.api_data.world_id == world_id);
-        
+
         if let Some(world) = world {
             world.user_data.is_photographed = is_photographed;
             FileService::write_worlds(&*worlds_lock)?;
@@ -181,7 +185,7 @@ impl FolderManager {
         let world = worlds_lock
             .iter_mut()
             .find(|w| w.api_data.world_id == world_id);
-        
+
         if let Some(world) = world {
             world.user_data.is_shared = is_shared;
             FileService::write_worlds(&*worlds_lock)?;
@@ -213,7 +217,7 @@ impl FolderManager {
         let world = worlds_lock
             .iter_mut()
             .find(|w| w.api_data.world_id == world_id);
-        
+
         if let Some(world) = world {
             world.user_data.is_favorite = is_favorite;
             // Write to custom_data.json for backward compatibility

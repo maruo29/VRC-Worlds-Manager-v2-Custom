@@ -10,9 +10,8 @@ pub mod preferences_commands;
 pub mod sort_commands;
 pub mod task;
 pub mod update;
-pub mod world_status_commands;
 pub mod util_commands;
-
+pub mod world_status_commands;
 
 use tauri_specta::{collect_commands, Builder};
 

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocalization } from '@/hooks/use-localization';
 import { useFolders } from '@/app/listview/hook/use-folders';
+import { usePopupStore } from '@/app/listview/hook/usePopups/store';
 import { commands, WorldDisplayData } from '@/lib/bindings';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -206,7 +207,11 @@ export default function FolderViewPage() {
                     ) : folderCards.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-64 text-center">
                             <Folder className="h-12 w-12 text-muted-foreground mb-2" />
-                            <p className="text-muted-foreground">{t('folder-view:no-folders')}</p>
+                            <p className="text-muted-foreground mb-4">{t('folder-view:no-folders')}</p>
+                            <AddFolderButton
+                                sizeConfig={sizeConfig}
+                                onClick={() => usePopupStore.getState().setPopup('showCreateFolder', true)}
+                            />
                         </div>
                     ) : (
                         <SortableContext
@@ -222,6 +227,10 @@ export default function FolderViewPage() {
                                         onClick={() => handleFolderClick(folder.name)}
                                     />
                                 ))}
+                                <AddFolderButton
+                                    sizeConfig={sizeConfig}
+                                    onClick={() => usePopupStore.getState().setPopup('showCreateFolder', true)}
+                                />
                             </div>
                         </SortableContext>
                     )}
@@ -328,6 +337,29 @@ function FolderCardComponent({ folder, sizeConfig, onClick }: FolderCardProps) {
                 <CardContent className="p-2">
                     <p className={`${sizeConfig.fontSize} font-medium truncate`} title={folder.name}>
                         {folder.name}
+                    </p>
+                </CardContent>
+            </Card>
+        </div>
+    );
+}
+
+function AddFolderButton({ sizeConfig, onClick }: { sizeConfig: { cardWidth: string; imageHeight: string; fontSize: string }, onClick: () => void }) {
+    return (
+        <div>
+            <Card
+                className={`${sizeConfig.cardWidth} cursor-pointer hover:bg-accent/50 transition-colors overflow-hidden border-dashed flex flex-col items-center justify-center`}
+                onClick={onClick}
+                style={{ height: "100%" }}
+            >
+                <div className={`${sizeConfig.imageHeight} w-full flex items-center justify-center bg-transparent`}>
+                    <div className="h-10 w-10 rounded-full border-2 border-muted-foreground/50 flex items-center justify-center">
+                        <Folder className="h-5 w-5 text-muted-foreground" />
+                    </div>
+                </div>
+                <CardContent className="p-2 w-full text-center">
+                    <p className={`${sizeConfig.fontSize} font-medium text-muted-foreground`}>
+                        + フォルダを追加
                     </p>
                 </CardContent>
             </Card>

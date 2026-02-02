@@ -298,7 +298,10 @@ impl FileService {
                         }
                     }
                 } else {
-                    log::info!("Auth file has version {}, skipping decryption.", cookies.version);
+                    log::info!(
+                        "Auth file has version {}, skipping decryption.",
+                        cookies.version
+                    );
                 }
                 Ok(cookies)
             }
@@ -328,11 +331,14 @@ impl FileService {
 
         log::info!("Reading files");
         log::info!("Reading files");
-        
+
         let preferences: PreferenceModel = match Self::read_file(&config_path) {
             Ok(data) => data,
             Err(e) => {
-                log::warn!("preferences.json is invalid or missing ({}), resetting to defaults...", e);
+                log::warn!(
+                    "preferences.json is invalid or missing ({}), resetting to defaults...",
+                    e
+                );
                 // Can't write here easily without ignoring result, but we return default
                 PreferenceModel::new()
             }
@@ -343,11 +349,11 @@ impl FileService {
             Err(_) => {
                 log::warn!("folders.json is invalid, recreating...");
                 Self::create_empty_folders_file().ok(); // Ignore write error
-                // Return empty if read fails again or just empty vec
+                                                        // Return empty if read fails again or just empty vec
                 Vec::new()
             }
         };
-        
+
         let mut worlds: Vec<WorldModel> = match Self::read_file(&worlds_path) {
             Ok(data) => data,
             Err(_) => {
@@ -356,7 +362,7 @@ impl FileService {
                 Vec::new()
             }
         };
-        
+
         let cookies = match Self::read_auth_file(&cookies_path) {
             Ok(data) => data,
             Err(e) => {
@@ -365,12 +371,12 @@ impl FileService {
                         log::warn!("auth.json is strictly invalid (syntax error), resetting...");
                         Self::create_empty_auth_file().ok();
                         AuthCookies::new()
-                    },
+                    }
                     FileError::FileNotFound => {
-                         // Normal first run
-                         Self::create_empty_auth_file().ok();
-                         AuthCookies::new()
-                    },
+                        // Normal first run
+                        Self::create_empty_auth_file().ok();
+                        AuthCookies::new()
+                    }
                     _ => {
                         // For PermissionDenied or AccessDenied, DO NOT WIPE. Return empty session temporarily but don't delete file.
                         log::error!("Failed to read auth.json ({}), returning empty session without overwriting.", e);
@@ -407,21 +413,31 @@ impl FileService {
 
         // Load custom data and merge with in-memory data
         let custom_data = Self::read_custom_data();
-        
+
         // Apply favorite status from custom_data.json
+        // Apply favorite, photographed, shared status from custom_data.json
         for world in worlds.iter_mut() {
             world.user_data.is_favorite = custom_data.is_world_favorite(&world.api_data.world_id);
+            world.user_data.is_photographed =
+                custom_data.is_world_photographed(&world.api_data.world_id);
+            world.user_data.is_shared = custom_data.is_world_shared(&world.api_data.world_id);
         }
-        
+
         // Apply folder colors from custom_data.json
         let mut folders = folders;
         for folder in folders.iter_mut() {
             folder.color = custom_data.get_folder_color(&folder.folder_name).cloned();
         }
-        
+
         // Apply extended preferences from custom_data.json
         let mut preferences = preferences;
         preferences.default_instance_type = custom_data.preferences.default_instance_type.clone();
+        if let Some(vb) = &custom_data.preferences.visible_buttons {
+            preferences.visible_buttons = vb.clone();
+        }
+        if let Some(fr) = &custom_data.preferences.dont_show_remove_from_folder {
+            preferences.dont_show_remove_from_folder = fr.clone();
+        }
 
         Ok((preferences, folders, worlds, cookies))
     }
@@ -439,6 +455,18 @@ impl FileService {
     /// Returns a FileError if the data could not be written
     pub fn write_preferences(preferences: &PreferenceModel) -> Result<(), FileError> {
         let (config_path, _, _, _) = Self::get_paths();
+
+        // Also update custom_data
+        let mut custom_data = Self::read_custom_data();
+        custom_data.preferences.default_instance_type = preferences.default_instance_type.clone();
+        custom_data.preferences.visible_buttons = Some(preferences.visible_buttons.clone());
+        custom_data.preferences.dont_show_remove_from_folder =
+            Some(preferences.dont_show_remove_from_folder.clone());
+        if let Err(e) = Self::write_custom_data(&custom_data) {
+            log::error!("Failed to write custom_data preferences: {}", e);
+            // Don't fail the main write? Or should we?
+            // Logging is safer for now.
+        }
 
         let data = serde_json::to_string_pretty(preferences).map_err(|_| FileError::InvalidFile)?;
         Self::atomic_write(&config_path, &data)
@@ -474,6 +502,32 @@ impl FileService {
     /// Returns a FileError if the data could not be written
     pub fn write_worlds(worlds: &Vec<WorldModel>) -> Result<(), FileError> {
         let (_, _, worlds_path, _) = Self::get_paths();
+
+        // Also update custom_data (favorites, photographed, shared)
+        let mut custom_data = Self::read_custom_data();
+        // Clear old maps to ensure we match current state exactly?
+        // Or should we only update? If a world is removed, we should probably remove it from custom_data too (for cleanup)
+        // But write_worlds might be partial? No, it usually overwrites the whole list.
+        // Let's rebuild the maps from the source list.
+        custom_data.world_favorites.clear();
+        custom_data.world_photographed.clear();
+        custom_data.world_shared.clear();
+
+        for world in worlds {
+            if world.user_data.is_favorite {
+                custom_data.set_world_favorite(&world.api_data.world_id, true);
+            }
+            if world.user_data.is_photographed {
+                custom_data.set_world_photographed(&world.api_data.world_id, true);
+            }
+            if world.user_data.is_shared {
+                custom_data.set_world_shared(&world.api_data.world_id, true);
+            }
+        }
+
+        if let Err(e) = Self::write_custom_data(&custom_data) {
+            log::error!("Failed to write custom_data worlds: {}", e);
+        }
 
         let data = serde_json::to_string_pretty(&worlds).map_err(|_| FileError::InvalidFile)?;
         Self::atomic_write(&worlds_path, &data)
@@ -581,21 +635,19 @@ impl FileService {
     /// Returns the custom data, or a new empty CustomData if file doesn't exist
     pub fn read_custom_data() -> CustomData {
         let custom_data_path = Self::get_custom_data_path();
-        
+
         if !custom_data_path.exists() {
             return CustomData::new();
         }
-        
+
         match fs::read_to_string(&custom_data_path) {
-            Ok(data) => {
-                match serde_json::from_str::<CustomData>(&data) {
-                    Ok(custom_data) => custom_data,
-                    Err(e) => {
-                        log::error!("Failed to parse custom_data.json: {}", e);
-                        CustomData::new()
-                    }
+            Ok(data) => match serde_json::from_str::<CustomData>(&data) {
+                Ok(custom_data) => custom_data,
+                Err(e) => {
+                    log::error!("Failed to parse custom_data.json: {}", e);
+                    CustomData::new()
                 }
-            }
+            },
             Err(e) => {
                 log::error!("Failed to read custom_data.json: {}", e);
                 CustomData::new()

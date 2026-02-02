@@ -1,4 +1,5 @@
 import { useLocalization } from '@/hooks/use-localization';
+import { relaunch } from '@tauri-apps/plugin-process';
 import {
   CardSize,
   commands,
@@ -216,8 +217,19 @@ export const useSettingsPage = () => {
 
       info('Restore completed successfully');
       toast(t('settings-page:restore-success-title'), {
-        description: t('settings-page:restore-success-description'),
+        description: t('settings-page:restore-success-description') + ' ' + t('general:restarting'),
       });
+
+      // Relaunch with fallback to reload
+      setTimeout(async () => {
+        try {
+          await relaunch();
+        } catch (e) {
+          error(`Relaunch failed: ${e}`);
+          window.location.reload();
+        }
+      }, 1500);
+
       onDataChange();
     } catch (e) {
       error(`Restore error: ${e}`);

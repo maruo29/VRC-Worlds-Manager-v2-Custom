@@ -9,12 +9,13 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { AlertCircle, Check, Loader2 } from 'lucide-react';
+import { AlertCircle, Check, Loader2, Plus } from 'lucide-react';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { useFolders } from '../../hook/use-folders';
+import { usePopupStore } from '@/app/listview/hook/usePopups/store';
 import {
   commands,
   WorldDetails,
@@ -362,6 +363,15 @@ export function AddWorldPopup({ onClose, currentFolder, initialWorldId }: AddWor
                   ) : (
                     <div className="text-sm text-muted-foreground w-full">{t('general:no-folders')}</div>
                   )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start pl-2 text-muted-foreground hover:text-foreground h-8"
+                    onClick={() => usePopupStore.getState().setPopup('showCreateFolder', true)}
+                  >
+                    <Plus className="h-3 w-3 mr-2" />
+                    <span className="text-xs">{t('app-sidebar:add-folder')}</span>
+                  </Button>
                 </div>
               </div>
             </div>
