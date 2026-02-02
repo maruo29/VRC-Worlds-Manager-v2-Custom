@@ -1,129 +1,84 @@
-# VRC Worlds Manager v2 (Custom Fork)
+# VRC Worlds Manager v2 (Custom Edition)
+
 
 > [!IMPORTANT]
-> **This is a forked version** of [Raifa21/VRC-Worlds-Manager-v2](https://github.com/Raifa21/VRC-Worlds-Manager-v2) with additional features.
-> 
-> See [CHANGELOG_CUSTOM.md](./CHANGELOG_CUSTOM.md) for a list of modifications.
-
-[日本語はこちら / 日本語のREADMEはREADME_JP.mdを参照してください。](./README_JP.md)
+> **これはフォーク版（カスタム改造版）です**  
+> 本家 [Raifa21/VRC-Worlds-Manager-v2](https://github.com/Raifa21/VRC-Worlds-Manager-v2) に、便利な機能を追加し、使い勝手を向上させたバージョンです。
 
 ---
 
-## Custom Features (Fork)
+## 📥 ダウンロード・インストール
 
-This fork adds the following features:
+**[Releases ページ](https://github.com/maruo29/VRC-Worlds-Manager-v2-Custom/releases)** から最新のインストーラー (`.exe`) をダウンロードしてください。
 
-- ⭐ **Favorite Button** - Mark worlds as favorites with a star button
-- 📏 **Window Size Persistence** - Remembers window size and position
-- 🎯 **Default Instance Type** - Set default instance type in settings
-- 🔀 **Folder Drag & Drop** - Reorder folders by dragging
-- 📤 **Native Export** - Export data compatible with the original VRC Worlds Manager v2
-- ✨ **Custom Branding** - Updated branding and About page
-- 📝 **Enhanced Logging** - Better debugging for folder operations
+### ⚠️ 重要: インストール時の注意（署名エラーについて）
+本アプリは個人の開発用証明書を使用している（または未署名の）ため、Windowsのセキュリティ機能 (SmartScreen) により警告が表示される場合があります。
 
----
+1. **「WindowsによってPCが保護されました」** という青い画面が出た場合：
+2. **「詳細情報」** をクリックします。
+3. **「実行」** ボタンが表示されるので、それをクリックしてインストールを進めてください。
 
-## Original Features
-
-VRC Worlds Manager is a Windows application designed to help VRChat users organize and store their favorite worlds more easily.
+※ これはウイルス等ではありませんが、個人開発アプリ特有の挙動です。安心してご使用ください。
 
 ---
 
-## Features
+## Chrome拡張機能の導入方法（推奨）
 
-- Add Favourite Worlds
-  - Automatically fetch worlds marked as Favourites on VRChat using the API and save them in the app.
-  - Once saved, the worlds will remain in the app even if removed from your VRChat Favourites.
-  - You can also add worlds directly using their URL links.
+VRChat公式サイトとの連携を強化するChrome拡張機能が同梱されています。導入すると、Webテキストから直接ワールド検索などが可能になります。
 
-- Organize Worlds into Folders
-  - Organize saved worlds into folders.
-  - A single world can be assigned to multiple folders.
+1. このリポジトリ（またはZip）内の `browser-extension` フォルダを確認します。
+2. Chromeブラウザで `chrome://extensions/` を開きます。
+3. 右上の **「デベロッパーモード」** をオンにします。
+4. **「パッケージ化されていない拡張機能を読み込む」** をクリックします。
+5. `browser-extension` フォルダを選択して読み込みます。
 
-- View World Details
-  - Check the details of a world from within the app.
-  - You can also attach notes to each world.
-
-- Search Function
-  - Search through saved worlds in the app.
-  - Supports searching by world creator, tags, and folders.
-
-- Discover Worlds
-  - Retrieve a list of recently visited worlds.
-  - Search for worlds using tags, text, exclusion tags, and more.
-
-- Create Instances
-  - Generate instances directly from the app. Group instances can also be created.
-  - When an instance is created, an invite will be sent, just like on the official VRChat website.
-
-- Share Folders
-  - Share folders and generate a UUID valid for 30 days.
-  - Folders can also be viewed on the web.
+これで拡張機能が有効になります。
 
 ---
 
-## Screenshots
+## ✨ カスタム機能（この版独自の特徴）
 
-![image](https://github.com/user-attachments/assets/13e36a5b-0ea4-4d80-ba9d-ed7dde811abd)
+本家バージョンに加え、以下の機能等が追加・改善されています：
 
-![image](https://github.com/user-attachments/assets/5b30cca7-b62c-4f11-b342-2ebbabcf0089)
-
-![image](https://github.com/user-attachments/assets/94a6ed0e-2828-484e-99d4-17fc9039fc44)
-
-![image](https://github.com/user-attachments/assets/8f567d9d-49eb-4e6b-a6d2-f65bf08cda84)
-
-![image](https://github.com/user-attachments/assets/d45f8363-b5d7-4a3b-8a94-d4cd39fdb372)
-
-
+### 🛠️ 機能強化・UI改善
+- **⭐ お気に入りボタン**: ワールドカード上にお気に入りボタン（★）と写真済みボタン（📷）を追加し、その場で切り替え可能にしました。
+- **🏷️ 高度な検索**: 「ワールドを探す」画面においても、フォルダタグの表示やお気に入り状態の反映が行われます。
+- **📏 ウィンドウサイズの記憶**: アプリのサイズと位置を記憶し、次回起動時に復元します。
+- **🔀 フォルダ整理**: フォルダ一覧でドラッグ＆ドロップによる並び替えが可能です。
+- **📤 データエクスポート**: 本家互換形式でのデータバックアップ（エクスポート）に対応しています。
+- **🏠 デフォルトインスタンス設定**: インスタンス作成時のデフォルトタイプ（Friends+, Invite+など）を設定で変更可能です。
 
 ---
 
-## Chrome Extension
+## 📜 オリジナルの機能（基本機能）
 
-This project includes a Chrome extension for enhanced integration.
+元となったVRC Worlds Managerの便利な機能もそのまま利用可能です：
 
-### Features
-- **Context Menu Search**: Search for selected text in VRC Worlds Manager directly from the browser context menu.
-- **Deep Link Support**: Handles deep links for better VRChat integration.
-
-### Installation
-1. Go to `chrome://extensions/` in Chrome.
-2. Enable "Developer mode" in the top right.
-3. Click "Load unpacked" and select the `browser-extension` folder in this repository.
+- **お気に入りワールドの管理**: VRChat上のFavoritesを取得・保存し、上限を超えて管理可能。
+- **フォルダ分け**: ワールドを自由にフォルダ分けして整理。重複登録もOK。
+- **詳細確認・メモ**: ワールドの詳細情報閲覧や、自分だけのメモ書きが可能。
+- **強力な検索**: ワールド名、作者、タグ、フォルダなどから横断検索。
+- **インスタンス作成**: アプリから直接インスタンスを起動・インバイト送信。
+- **フォルダ共有**: 作成したフォルダリストをWeb経由で共有可能。
 
 ---
 
-## Installation
+## 📷 スクリーンショット
 
-Download the latest release from the Releases page of this repository and run the `.exe` file.  
-No additional setup is required.
-
----
-
-## Build/Release
-
-This project uses [Tauri](https://tauri.app/) and [Next.js](https://nextjs.org/).  
-To build from source, clone the repository and follow the instructions in the [Tauri documentation](https://tauri.app/v1/guides/getting-started/prerequisites/) and [Next.js documentation](https://nextjs.org/docs).
+| ワールド一覧 | 検索画面 |
+|---|---|
+| ![List](https://github.com/user-attachments/assets/0c66ccd5-13df-4064-8d08-b91256fc01dc) | ![Find](https://github.com/user-attachments/assets/d7c7ff13-556e-4118-aefc-c2c3de2e661e) |
 
 ---
 
-## Contributing
+## ビルド・開発
 
-Contributions are welcome!  
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+本プロジェクトは [Tauri](https://tauri.app/) と [Next.js](https://nextjs.org/) を使用しています。
+ソースコードからビルドする場合は、Node.js と Rust 環境が必要です。
 
----
+## ライセンス & クレジット
+- **Original Project**: [Raifa21/VRC-Worlds-Manager-v2](https://github.com/Raifa21/VRC-Worlds-Manager-v2)
+- **License**: MIT License (一部画像素材は CC-BY-NC-4.0)
+- **Contributors**: コントリビュートは大歓迎です！
 
-## License
-
-This project is licensed under the MIT License. See the [LICENCE](LICENCE) file for details.
-
-Some components are licensed under [CC-BY-NC-4.0](https://creativecommons.org/licenses/by-nc/4.0/) and are for non-commercial use only. See the [LICENSE_ADDITIONAL](LICENSE_ADDITIONAL) file for details.
-
----
-
-## Credits
-
-- Special thanks to VRChat and the VRChat API Community for providing API documentation.
-- VRChat-like sidebar icons provided by 黒音キト, licensed under CC-BY-NC-4.0.
-- Application icon uses Ciel-chan, with thanks to ArmoireLepus for approval to use.
+詳細なライセンス情報は [LICENCE](LICENCE) および [LICENSE_ADDITIONAL](LICENSE_ADDITIONAL) をご確認ください。
