@@ -8,7 +8,7 @@
 
 ## 📥 ダウンロード・インストール
 
-**[Releases ページ](https://github.com/あなたのユーザー名/リポジトリ名/releases)** から最新のインストーラー (`.exe`) をダウンロードしてください。
+**[Releases ページ](https://github.com/maruo29/VRC-Worlds-Manager-v2-Custom/releases)** から最新のインストーラー (`.exe`) をダウンロードしてください。
 
 ### ⚠️ 重要: インストール時の注意（署名エラーについて）
 本アプリは個人の開発用証明書を使用している（または未署名の）ため、Windowsのセキュリティ機能 (SmartScreen) により警告が表示される場合があります。
