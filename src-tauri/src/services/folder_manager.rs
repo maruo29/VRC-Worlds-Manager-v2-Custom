@@ -837,6 +837,10 @@ impl FolderManager {
         new_worlds: Vec<WorldApiData>,
     ) -> Result<(), AppError> {
         let mut worlds_lock = worlds.write().map_err(|_| ConcurrencyError::PoisonedLock)?;
+
+        // Read custom data to check for existing status
+        let custom_data = FileService::read_custom_data();
+
         for new_world in new_worlds {
             let world_id = new_world.world_id.clone();
             log::info!("Adding world: {}", world_id);
@@ -860,7 +864,14 @@ impl FolderManager {
                     world.user_data.last_checked = chrono::Utc::now();
                 }
                 None => {
-                    worlds_lock.push(WorldModel::new(new_world));
+                    let mut world_model = WorldModel::new(new_world);
+                    // Check if the world existing status in custom_data
+                    world_model.user_data.is_favorite = custom_data.is_world_favorite(&world_id);
+                    world_model.user_data.is_photographed =
+                        custom_data.is_world_photographed(&world_id);
+                    world_model.user_data.is_shared = custom_data.is_world_shared(&world_id);
+
+                    worlds_lock.push(world_model);
                 }
             }
         }

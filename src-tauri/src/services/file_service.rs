@@ -395,6 +395,18 @@ impl FileService {
                 .collect();
         }
 
+        // Load custom data and merge with in-memory data
+        let custom_data = Self::read_custom_data();
+
+        // Apply favorite status from custom_data.json
+        // Apply favorite, photographed, shared status from custom_data.json
+        for world in worlds.iter_mut() {
+            world.user_data.is_favorite = custom_data.is_world_favorite(&world.api_data.world_id);
+            world.user_data.is_photographed =
+                custom_data.is_world_photographed(&world.api_data.world_id);
+            world.user_data.is_shared = custom_data.is_world_shared(&world.api_data.world_id);
+        }
+
         // Backwards‐compat: dedupe any duplicate platform entries in worlds.json
         {
             use std::collections::HashSet;
@@ -409,18 +421,6 @@ impl FileService {
             if let Err(e) = Self::write_worlds(&worlds) {
                 log::error!("Failed to persist deduplicated worlds.json: {}", e);
             }
-        }
-
-        // Load custom data and merge with in-memory data
-        let custom_data = Self::read_custom_data();
-
-        // Apply favorite status from custom_data.json
-        // Apply favorite, photographed, shared status from custom_data.json
-        for world in worlds.iter_mut() {
-            world.user_data.is_favorite = custom_data.is_world_favorite(&world.api_data.world_id);
-            world.user_data.is_photographed =
-                custom_data.is_world_photographed(&world.api_data.world_id);
-            world.user_data.is_shared = custom_data.is_world_shared(&world.api_data.world_id);
         }
 
         // Apply folder colors from custom_data.json
@@ -505,24 +505,17 @@ impl FileService {
 
         // Also update custom_data (favorites, photographed, shared)
         let mut custom_data = Self::read_custom_data();
-        // Clear old maps to ensure we match current state exactly?
         // Or should we only update? If a world is removed, we should probably remove it from custom_data too (for cleanup)
         // But write_worlds might be partial? No, it usually overwrites the whole list.
-        // Let's rebuild the maps from the source list.
-        custom_data.world_favorites.clear();
-        custom_data.world_photographed.clear();
-        custom_data.world_shared.clear();
+        // Let's NOT clear maps, to avoid losing data for worlds not loaded in memory.
 
         for world in worlds {
-            if world.user_data.is_favorite {
-                custom_data.set_world_favorite(&world.api_data.world_id, true);
-            }
-            if world.user_data.is_photographed {
-                custom_data.set_world_photographed(&world.api_data.world_id, true);
-            }
-            if world.user_data.is_shared {
-                custom_data.set_world_shared(&world.api_data.world_id, true);
-            }
+            custom_data.set_world_favorite(&world.api_data.world_id, world.user_data.is_favorite);
+            custom_data.set_world_photographed(
+                &world.api_data.world_id,
+                world.user_data.is_photographed,
+            );
+            custom_data.set_world_shared(&world.api_data.world_id, world.user_data.is_shared);
         }
 
         if let Err(e) = Self::write_custom_data(&custom_data) {
@@ -637,20 +630,52 @@ impl FileService {
         let custom_data_path = Self::get_custom_data_path();
 
         if !custom_data_path.exists() {
+            log::info!("custom_data.json does not exist, creating new.");
             return CustomData::new();
         }
 
-        match fs::read_to_string(&custom_data_path) {
-            Ok(data) => match serde_json::from_str::<CustomData>(&data) {
-                Ok(custom_data) => custom_data,
-                Err(e) => {
-                    log::error!("Failed to parse custom_data.json: {}", e);
+        let parse_file = |path: &PathBuf| -> Result<CustomData, FileError> {
+            let data = fs::read_to_string(path).map_err(|e| {
+                log::warn!("Failed to read file {:?}: {}", path, e);
+                FileError::FileNotFound
+            })?;
+            
+            if Self::is_file_corrupted_with_null_bytes(&data) {
+                log::warn!("File {:?} is corrupted (null bytes)", path);
+                return Err(FileError::InvalidFile);
+            }
+
+            serde_json::from_str::<CustomData>(&data).map_err(|e| {
+                log::warn!("Failed to parse JSON in {:?}: {}", path, e);
+                FileError::InvalidFile
+            })
+        };
+
+        match parse_file(&custom_data_path) {
+            Ok(data) => {
+                log::info!("Successfully loaded custom_data.json. Favorites: {}", data.world_favorites.len());
+                data
+            },
+            Err(_) => {
+                log::error!("Failed to read primary custom_data.json, attempting backup...");
+                let backup_path = Self::get_backup_path(&custom_data_path);
+                if backup_path.exists() {
+                     match parse_file(&backup_path) {
+                        Ok(data) => {
+                            log::info!("Successfully recovered custom_data from backup. Favorites: {}", data.world_favorites.len());
+                            // Restore backup
+                            Self::restore_backup_to_primary(&backup_path, &custom_data_path);
+                            data
+                        },
+                        Err(_) => {
+                            log::error!("Failed to recover custom_data from backup. Returning empty.");
+                            CustomData::new()
+                        }
+                     }
+                } else {
+                    log::error!("No backup found for custom_data.json. Returning empty.");
                     CustomData::new()
                 }
-            },
-            Err(e) => {
-                log::error!("Failed to read custom_data.json: {}", e);
-                CustomData::new()
             }
         }
     }
