@@ -216,7 +216,10 @@ export function useWorldFilters(worlds: WorldDisplayData[]) {
 
     function passesSyncFilters(world: WorldDisplayData): boolean {
       // Status filters
-      if (photographedFilter !== null && world.isPhotographed !== photographedFilter) {
+      if (
+        photographedFilter !== null &&
+        world.isPhotographed !== photographedFilter
+      ) {
         return false;
       }
       if (sharedFilter !== null && world.isShared !== sharedFilter) {
@@ -322,8 +325,11 @@ export function useWorldFilters(worlds: WorldDisplayData[]) {
         );
       }
 
-      // 3. Sorting (delegated to backend for consistency)
-      const fallbackSort = () => {
+      // 3. Sorting. This used to round-trip the whole list through the
+      // backend, which failed on every call ("missing field dateAdded") and
+      // fell back to this comparator anyway, after serialising hundreds of
+      // worlds over IPC twice.
+      const sortWorlds = () => {
         const dirFactor = sortDirection === 'asc' ? 1 : -1;
         return finalList.slice().sort((a, b) => {
           const av = getSortValue(a, sortField);
@@ -342,24 +348,7 @@ export function useWorldFilters(worlds: WorldDisplayData[]) {
         });
       };
 
-      let sortedList: WorldDisplayData[];
-      try {
-        const sortRes = await commands.sortWorldsDisplay(
-          finalList,
-          sortField,
-          sortDirection,
-        );
-        if (sortRes.status === 'ok') {
-          sortedList = sortRes.data;
-        } else {
-          error(`[useWorldFilters] Backend sort failed: ${sortRes.error}`);
-          sortedList = fallbackSort();
-        }
-      } catch (e) {
-        error(`[useWorldFilters] Exception during backend sort: ${e}`);
-        sortedList = fallbackSort();
-      }
-      finalList = sortedList;
+      finalList = sortWorlds();
 
       // 4. Priority Sorting (Custom logic)
       if (prioritySort !== 'none') {

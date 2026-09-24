@@ -297,6 +297,12 @@ impl TryInto<WorldDisplayData> for VRChatWorld {
             author_name: self.author_name.clone(),
             favorites: self.favorites,
             last_updated: self.updated_at,
+            // VRChat sends the literal string "none" for unpublished worlds.
+            publication_date: if self.publication_date == "none" {
+                None
+            } else {
+                Some(self.publication_date.clone())
+            },
             visits: self.visits.unwrap_or(0),
             date_added: "".to_string(),
             platform: if platform.contains(&"standalonewindows".to_string())
@@ -330,6 +336,9 @@ pub struct WorldSearchParameters {
     pub platform: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub search: Option<String>,
+    /// Restricts the search to a single author.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
 }
 
 impl WorldSearchParameters {
@@ -352,6 +361,9 @@ impl WorldSearchParameters {
         if let Some(ref search) = self.search {
             query.push(format!("search={}", urlencoding::encode(search)));
         }
+        if let Some(ref user_id) = self.user_id {
+            query.push(format!("userId={}", urlencoding::encode(user_id)));
+        }
 
         query.join("&")
     }
@@ -363,6 +375,7 @@ pub struct WorldSearchParametersBuilder {
     pub notag: Option<String>,
     pub platform: Option<String>,
     pub search: Option<String>,
+    pub user_id: Option<String>,
 }
 
 impl WorldSearchParametersBuilder {
@@ -373,6 +386,7 @@ impl WorldSearchParametersBuilder {
             notag: None,
             platform: None,
             search: None,
+            user_id: None,
         }
     }
 
@@ -408,6 +422,7 @@ impl WorldSearchParametersBuilder {
             notag: self.notag,
             platform: self.platform,
             search: self.search,
+            user_id: self.user_id,
         }
     }
 }

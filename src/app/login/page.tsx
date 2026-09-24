@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { resolveStartupRoute } from '@/lib/startup-page';
 import { commands } from '@/lib/bindings';
 import { useLocalization } from '@/hooks/use-localization';
 import { info, error } from '@tauri-apps/plugin-log';
@@ -60,7 +61,7 @@ export default function Login() {
       }
 
       info('Login successful, redirecting to listview');
-      router.push('/listview/folders/special/all');
+      router.push(await resolveStartupRoute());
     } finally {
       setLoading(false);
     }
@@ -82,7 +83,7 @@ export default function Login() {
         return;
       }
       info('2FA verification successful, redirecting to listview');
-      router.push('/listview/folders/special/all');
+      router.push(await resolveStartupRoute());
     } catch (e) {
       const errorMessage = (e as string) || t('login-page:error-invalid-2fa');
       error(`2FA error: ${errorMessage}`);

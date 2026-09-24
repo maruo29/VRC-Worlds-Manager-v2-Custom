@@ -4,6 +4,7 @@ use crate::definitions::DefaultInstanceType;
 use crate::definitions::FilterItemSelectorStarred;
 use crate::definitions::FilterItemSelectorStarredType;
 use crate::definitions::FolderRemovalPreference;
+use crate::definitions::RelatedWeights;
 use crate::services::FileService;
 use crate::updater::update_handler::UpdateChannel;
 use crate::PREFERENCES;
@@ -109,6 +110,12 @@ pub fn get_starred_filter_items(id: FilterItemSelectorStarredType) -> Result<Vec
             FilterItemSelectorStarredType::Folder => {
                 Ok(filter_item_selector_starred.folder.clone())
             }
+            FilterItemSelectorStarredType::RecommendTag => {
+                Ok(filter_item_selector_starred.recommend_tag.clone())
+            }
+            FilterItemSelectorStarredType::RecommendExcludeTag => {
+                Ok(filter_item_selector_starred.recommend_exclude_tag.clone())
+            }
         }
     } else {
         Ok(vec![])
@@ -125,18 +132,25 @@ pub fn set_starred_filter_items(
     let preferences = preferences_lock.as_mut().unwrap();
 
     if preferences.filter_item_selector_starred.is_none() {
-        let (author, tag, exclude_tag, folder) = match id {
-            FilterItemSelectorStarredType::Author => (values, vec![], vec![], vec![]),
-            FilterItemSelectorStarredType::Tag => (vec![], values, vec![], vec![]),
-            FilterItemSelectorStarredType::ExcludeTag => (vec![], vec![], values, vec![]),
-            FilterItemSelectorStarredType::Folder => (vec![], vec![], vec![], values),
+        let mut starred = FilterItemSelectorStarred {
+            author: vec![],
+            tag: vec![],
+            exclude_tag: vec![],
+            folder: vec![],
+            recommend_tag: vec![],
+            recommend_exclude_tag: vec![],
         };
-        preferences.filter_item_selector_starred = Some(FilterItemSelectorStarred {
-            author,
-            tag,
-            exclude_tag,
-            folder,
-        });
+        match id {
+            FilterItemSelectorStarredType::Author => starred.author = values,
+            FilterItemSelectorStarredType::Tag => starred.tag = values,
+            FilterItemSelectorStarredType::ExcludeTag => starred.exclude_tag = values,
+            FilterItemSelectorStarredType::Folder => starred.folder = values,
+            FilterItemSelectorStarredType::RecommendTag => starred.recommend_tag = values,
+            FilterItemSelectorStarredType::RecommendExcludeTag => {
+                starred.recommend_exclude_tag = values
+            }
+        };
+        preferences.filter_item_selector_starred = Some(starred);
     } else {
         let filter_item_selector_starred =
             preferences.filter_item_selector_starred.as_mut().unwrap();
@@ -152,6 +166,12 @@ pub fn set_starred_filter_items(
             }
             FilterItemSelectorStarredType::Folder => {
                 filter_item_selector_starred.folder = values;
+            }
+            FilterItemSelectorStarredType::RecommendTag => {
+                filter_item_selector_starred.recommend_tag = values;
+            }
+            FilterItemSelectorStarredType::RecommendExcludeTag => {
+                filter_item_selector_starred.recommend_exclude_tag = values;
             }
         }
     }
@@ -290,6 +310,174 @@ pub fn set_visible_buttons(
     let mut preferences_lock = PREFERENCES.get().write();
     let preferences = preferences_lock.as_mut().unwrap();
     preferences.visible_buttons = visible_buttons;
+    FileService::write_preferences(preferences).map_err(|e| {
+        log::error!("Error writing preferences: {}", e);
+        e.to_string()
+    })?;
+    Ok(())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn get_recommend_manual_tags() -> Result<Vec<String>, String> {
+    let preferences_lock = PREFERENCES.get().read();
+    let preferences = preferences_lock.as_ref().unwrap();
+    Ok(preferences.recommend_manual_tags.clone())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn set_recommend_manual_tags(tags: Vec<String>) -> Result<(), String> {
+    let mut preferences_lock = PREFERENCES.get().write();
+    let preferences = preferences_lock.as_mut().unwrap();
+    preferences.recommend_manual_tags = tags;
+    FileService::write_preferences(preferences).map_err(|e| {
+        log::error!("Error writing preferences: {}", e);
+        e.to_string()
+    })?;
+    Ok(())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn get_recommend_excluded_tags() -> Result<Vec<String>, String> {
+    let preferences_lock = PREFERENCES.get().read();
+    let preferences = preferences_lock.as_ref().unwrap();
+    Ok(preferences.recommend_excluded_tags.clone())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn set_recommend_excluded_tags(tags: Vec<String>) -> Result<(), String> {
+    let mut preferences_lock = PREFERENCES.get().write();
+    let preferences = preferences_lock.as_mut().unwrap();
+    preferences.recommend_excluded_tags = tags;
+    FileService::write_preferences(preferences).map_err(|e| {
+        log::error!("Error writing preferences: {}", e);
+        e.to_string()
+    })?;
+    Ok(())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn get_quick_folder_enabled() -> Result<bool, String> {
+    let preferences_lock = PREFERENCES.get().read();
+    let preferences = preferences_lock.as_ref().unwrap();
+    Ok(preferences.quick_folder_enabled)
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn set_quick_folder_enabled(enabled: bool) -> Result<(), String> {
+    let mut preferences_lock = PREFERENCES.get().write();
+    let preferences = preferences_lock.as_mut().unwrap();
+    preferences.quick_folder_enabled = enabled;
+    FileService::write_preferences(preferences).map_err(|e| {
+        log::error!("Error writing preferences: {}", e);
+        e.to_string()
+    })?;
+    Ok(())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn get_startup_page() -> Result<String, String> {
+    let preferences_lock = PREFERENCES.get().read();
+    let preferences = preferences_lock.as_ref().unwrap();
+    Ok(preferences.startup_page.clone())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn set_startup_page(page: String) -> Result<(), String> {
+    let mut preferences_lock = PREFERENCES.get().write();
+    let preferences = preferences_lock.as_mut().unwrap();
+    preferences.startup_page = page;
+    FileService::write_preferences(preferences).map_err(|e| {
+        log::error!("Error writing preferences: {}", e);
+        e.to_string()
+    })?;
+    Ok(())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn get_quick_folder_name() -> Result<String, String> {
+    let preferences_lock = PREFERENCES.get().read();
+    let preferences = preferences_lock.as_ref().unwrap();
+    Ok(preferences.quick_folder_name.clone())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn set_quick_folder_name(name: String) -> Result<(), String> {
+    let mut preferences_lock = PREFERENCES.get().write();
+    let preferences = preferences_lock.as_mut().unwrap();
+    preferences.quick_folder_name = name;
+    FileService::write_preferences(preferences).map_err(|e| {
+        log::error!("Error writing preferences: {}", e);
+        e.to_string()
+    })?;
+    Ok(())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn get_status_folder_enabled() -> Result<bool, String> {
+    let preferences_lock = PREFERENCES.get().read();
+    let preferences = preferences_lock.as_ref().unwrap();
+    Ok(preferences.status_folder_enabled)
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn set_status_folder_enabled(enabled: bool) -> Result<(), String> {
+    let mut preferences_lock = PREFERENCES.get().write();
+    let preferences = preferences_lock.as_mut().unwrap();
+    preferences.status_folder_enabled = enabled;
+    FileService::write_preferences(preferences).map_err(|e| {
+        log::error!("Error writing preferences: {}", e);
+        e.to_string()
+    })?;
+    Ok(())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn get_library_item_order() -> Result<Vec<String>, String> {
+    let preferences_lock = PREFERENCES.get().read();
+    let preferences = preferences_lock.as_ref().unwrap();
+    Ok(preferences.library_item_order.clone())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn set_library_item_order(order: Vec<String>) -> Result<(), String> {
+    let mut preferences_lock = PREFERENCES.get().write();
+    let preferences = preferences_lock.as_mut().unwrap();
+    preferences.library_item_order = order;
+    FileService::write_preferences(preferences).map_err(|e| {
+        log::error!("Error writing preferences: {}", e);
+        e.to_string()
+    })?;
+    Ok(())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn get_related_weights() -> Result<RelatedWeights, String> {
+    let preferences_lock = PREFERENCES.get().read();
+    let preferences = preferences_lock.as_ref().unwrap();
+    Ok(preferences.related_weights.clone())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn set_related_weights(weights: RelatedWeights) -> Result<(), String> {
+    let mut preferences_lock = PREFERENCES.get().write();
+    let preferences = preferences_lock.as_mut().unwrap();
+    preferences.related_weights = weights;
     FileService::write_preferences(preferences).map_err(|e| {
         log::error!("Error writing preferences: {}", e);
         e.to_string()

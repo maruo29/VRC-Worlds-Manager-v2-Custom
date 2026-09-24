@@ -3,6 +3,8 @@ import { create } from 'zustand';
 
 interface PopupState {
   showAddToFolder: WorldDisplayData[] | null;
+  /** Folders pre-marked for removal when the dialog opens. */
+  addToFolderPreRemove: string[] | null;
   showAddWorld: boolean | { initialWorldId?: string };
   showAdvancedSearchPanel: boolean;
   showCreateFolder: boolean;
@@ -21,6 +23,7 @@ interface PopupState {
 
 export const usePopupStore = create<PopupState>((set) => ({
   showAddToFolder: null,
+  addToFolderPreRemove: null,
   showAddWorld: false,
   showAdvancedSearchPanel: false,
   showCreateFolder: false,
@@ -37,6 +40,7 @@ export const usePopupStore = create<PopupState>((set) => ({
   resetPopups: () =>
     set({
       showAddToFolder: null,
+      addToFolderPreRemove: null,
       showAddWorld: false,
       showAdvancedSearchPanel: false,
       showCreateFolder: false,

@@ -16,6 +16,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { useFolders } from '../../hook/use-folders';
 import { usePopupStore } from '@/app/listview/hook/usePopups/store';
+import { useQuickFolderStore } from '@/app/listview/hook/use-quick-folder';
 import {
   commands,
   WorldDetails,
@@ -35,6 +36,7 @@ import { useLocalization } from '@/hooks/use-localization';
 import { info, error as logError } from '@tauri-apps/plugin-log';
 import { useWorlds } from '../../hook/use-worlds';
 import { FolderType } from '@/types/folders';
+import { detailsToDisplayData } from '@/lib/world-display';
 
 interface AddWorldPopupProps {
   currentFolder: FolderType;
@@ -42,7 +44,11 @@ interface AddWorldPopupProps {
   initialWorldId?: string;
 }
 
-export function AddWorldPopup({ onClose, currentFolder, initialWorldId }: AddWorldPopupProps) {
+export function AddWorldPopup({
+  onClose,
+  currentFolder,
+  initialWorldId,
+}: AddWorldPopupProps) {
   const { t } = useLocalization();
   const [worldInput, setWorldInput] = useState<string>(initialWorldId || '');
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +59,7 @@ export function AddWorldPopup({ onClose, currentFolder, initialWorldId }: AddWor
   const [existingWorlds, setExistingWorlds] = useState<string[]>([]);
   const [selectedFolders, setSelectedFolders] = useState<string[]>([]);
 
-  const { addWorld, getAllWorlds } = useWorlds(currentFolder);
+  const { addWorld, getAllWorlds, refresh } = useWorlds(currentFolder);
   const { folders } = useFolders();
 
   useEffect(() => {
@@ -69,7 +75,6 @@ export function AddWorldPopup({ onClose, currentFolder, initialWorldId }: AddWor
       }
     }
     fetchWorlds();
-
   }, [getAllWorlds]);
 
   useEffect(() => {
@@ -167,10 +172,18 @@ export function AddWorldPopup({ onClose, currentFolder, initialWorldId }: AddWor
         if (selectedFolders.length > 0) {
           await Promise.all(
             selectedFolders.map((folderName) =>
-              commands.addWorldToFolder(folderName, previewWorld.worldId)
-            )
+              commands.addWorldToFolder(folderName, previewWorld.worldId),
+            ),
           );
+          // addWorld already reloaded the current folder, but before these
+          // were added, so the new card would show too few folder tags.
+          await refresh();
         }
+
+        // The quick-folder checkbox reads a membership set rather than each
+        // card's folder list; without this, a world just added to the quick
+        // folder from here showed an unticked box.
+        await useQuickFolderStore.getState().loadMembers();
 
         setWorldInput('');
         setPreviewWorld(null);
@@ -252,25 +265,12 @@ export function AddWorldPopup({ onClose, currentFolder, initialWorldId }: AddWor
                 <div className="flex justify-between">
                   <WorldCardPreview
                     size="Normal"
-                    world={{
-                      worldId: previewWorld.worldId,
-                      name: previewWorld.name,
-                      thumbnailUrl: previewWorld.thumbnailUrl,
-                      authorName: previewWorld.authorName,
-                      favorites: previewWorld.favorites,
-                      lastUpdated: previewWorld.lastUpdated,
-                      visits: previewWorld.visits,
+                    world={detailsToDisplayData(previewWorld, {
                       dateAdded: new Date().toISOString(),
-                      platform: previewWorld.platform,
-                      folders: [],
                       tags: [],
-                      capacity: previewWorld.capacity,
-                      isPhotographed: false,
-                      isShared: false,
-                      isFavorite: false,
-                    }}
-                    onTogglePhotographed={() => { }}
-                    onToggleShared={() => { }}
+                    })}
+                    onTogglePhotographed={() => {}}
+                    onToggleShared={() => {}}
                   />
                   <div className="flex flex-col gap-4">
                     <div>
@@ -340,15 +340,25 @@ export function AddWorldPopup({ onClose, currentFolder, initialWorldId }: AddWor
                 <div className="flex flex-wrap gap-2">
                   {folders.length > 0 ? (
                     folders.map((folder) => (
-                      <div key={folder.name} className="flex items-center space-x-2 bg-secondary/50 p-1 rounded-md pr-2">
+                      <div
+                        key={folder.name}
+                        className="flex items-center space-x-2 bg-secondary/50 p-1 rounded-md pr-2"
+                      >
                         <Checkbox
                           id={`folder-${folder.name}`}
                           checked={selectedFolders.includes(folder.name)}
                           onCheckedChange={(checked) => {
                             if (checked) {
-                              setSelectedFolders([...selectedFolders, folder.name]);
+                              setSelectedFolders([
+                                ...selectedFolders,
+                                folder.name,
+                              ]);
                             } else {
-                              setSelectedFolders(selectedFolders.filter((f) => f !== folder.name));
+                              setSelectedFolders(
+                                selectedFolders.filter(
+                                  (f) => f !== folder.name,
+                                ),
+                              );
                             }
                           }}
                         />
@@ -361,16 +371,24 @@ export function AddWorldPopup({ onClose, currentFolder, initialWorldId }: AddWor
                       </div>
                     ))
                   ) : (
-                    <div className="text-sm text-muted-foreground w-full">{t('general:no-folders')}</div>
+                    <div className="text-sm text-muted-foreground w-full">
+                      {t('general:no-folders')}
+                    </div>
                   )}
                   <Button
                     variant="ghost"
                     size="sm"
                     className="w-full justify-start pl-2 text-muted-foreground hover:text-foreground h-8"
-                    onClick={() => usePopupStore.getState().setPopup('showCreateFolder', true)}
+                    onClick={() =>
+                      usePopupStore
+                        .getState()
+                        .setPopup('showCreateFolder', true)
+                    }
                   >
                     <Plus className="h-3 w-3 mr-2" />
-                    <span className="text-xs">{t('app-sidebar:add-folder')}</span>
+                    <span className="text-xs">
+                      {t('app-sidebar:add-folder')}
+                    </span>
                   </Button>
                 </div>
               </div>

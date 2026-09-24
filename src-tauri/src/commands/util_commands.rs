@@ -99,3 +99,23 @@ fn extract_meta_refresh(html: &str) -> Option<String> {
 pub fn get_startup_deep_link(state: tauri::State<crate::StartupDeepLink>) -> Option<String> {
     state.0.lock().unwrap().take()
 }
+
+/// Writes a search snapshot the user picked a path for with the save dialog.
+#[tauri::command]
+#[specta::specta]
+pub fn save_search_snapshot(path: String, contents: String) -> Result<(), String> {
+    std::fs::write(&path, contents).map_err(|e| {
+        log::error!("Failed to write the snapshot to {}: {}", path, e);
+        format!("Failed to write the file: {}", e)
+    })
+}
+
+/// Reads back a snapshot written by `save_search_snapshot`.
+#[tauri::command]
+#[specta::specta]
+pub fn load_search_snapshot(path: String) -> Result<String, String> {
+    std::fs::read_to_string(&path).map_err(|e| {
+        log::error!("Failed to read the snapshot at {}: {}", path, e);
+        format!("Failed to read the file: {}", e)
+    })
+}

@@ -74,6 +74,19 @@ export function PopupManager() {
       .replace(/^http\/\//, 'http://');
   };
 
+  /** Hidden worlds count: they are in the library, just out of sight. */
+  const isInLibrary = async (worldId: string) => {
+    const [visible, hidden] = await Promise.all([
+      commands.getAllWorlds(),
+      commands.getHiddenWorlds(),
+    ]);
+    return [visible, hidden].some(
+      (result) =>
+        result.status === 'ok' &&
+        result.data.some((world) => world.worldId === worldId),
+    );
+  };
+
   const processUrl = async (text: string) => {
     // Normalize URL first
     const normalizedText = normalizeUrl(text);
@@ -87,7 +100,11 @@ export function PopupManager() {
     }
 
     // 2. Check if it's a VRChat URL
-    if (!worldIdToUse && (normalizedText.includes('vrchat.com/home/launch/world/') || normalizedText.includes('vrchat.com/home/world/'))) {
+    if (
+      !worldIdToUse &&
+      (normalizedText.includes('vrchat.com/home/launch/world/') ||
+        normalizedText.includes('vrchat.com/home/world/'))
+    ) {
       const match = normalizedText.match(/wrld_[a-zA-Z0-9-]{36}/);
       if (match) {
         worldIdToUse = match[0];
@@ -96,12 +113,18 @@ export function PopupManager() {
     }
 
     // 3. If still unknown, try resolving redirects (Shortened URLs)
-    if (!worldIdToUse && (normalizedText.startsWith('http://') || normalizedText.startsWith('https://'))) {
+    if (
+      !worldIdToUse &&
+      (normalizedText.startsWith('http://') ||
+        normalizedText.startsWith('https://'))
+    ) {
       info(`Attempting to resolve URL: ${normalizedText}`);
       const toastId = toast.loading(t('add-world-dialog:resolving-url'));
 
       try {
-        const resolvedUrl = await invoke<string>('resolve_redirects', { url: normalizedText });
+        const resolvedUrl = await invoke<string>('resolve_redirects', {
+          url: normalizedText,
+        });
         info(`Resolved URL: ${resolvedUrl}`);
 
         const resolvedMatch = resolvedUrl.match(/wrld_[a-zA-Z0-9-]{36}/);
@@ -111,13 +134,13 @@ export function PopupManager() {
         } else {
           info('Resolved URL does not contain a world ID');
           toast.error(t('add-world-dialog:url-invalid'), {
-            description: resolvedUrl
+            description: resolvedUrl,
           });
         }
       } catch (err) {
         error(`Failed to resolve URL: ${err}`);
         toast.error(t('add-world-dialog:resolution-failed'), {
-          description: String(err)
+          description: String(err),
         });
       } finally {
         toast.dismiss(toastId);
@@ -140,6 +163,14 @@ export function PopupManager() {
 
       if (isBlockingPopupOpen) {
         setPopup('showDNDConfirm', { url: worldIdToUse });
+      } else if (await isInLibrary(worldIdToUse)) {
+        // A world already saved goes straight to its details. The add dialog
+        // only has "you already have this" to say about it, which is a dead
+        // end when the point of following the link was to look at the world.
+        setPopup('showWorldDetails', {
+          id: worldIdToUse,
+          dontSaveToLocal: false,
+        });
       } else {
         setPopup('showAddWorld', { initialWorldId: worldIdToUse });
       }
@@ -153,8 +184,6 @@ export function PopupManager() {
       e.preventDefault();
       e.stopPropagation();
     };
-
-
 
     const handleDrop = async (e: DragEvent) => {
       e.preventDefault();
@@ -197,7 +226,7 @@ export function PopupManager() {
     showShareFolder,
     showShareWorld,
     setPopup,
-    t // Added dependency
+    t, // Added dependency
   ]);
 
   // Helper to handle search action
@@ -212,7 +241,9 @@ export function PopupManager() {
   useEffect(() => {
     const checkStartupArgs = async () => {
       try {
-        const startupLink = await invoke<string | null>('get_startup_deep_link');
+        const startupLink = await invoke<string | null>(
+          'get_startup_deep_link',
+        );
         if (startupLink) {
           info(`Startup deep link found: ${startupLink}`);
           // Re-use logic for parsing
@@ -225,7 +256,9 @@ export function PopupManager() {
             }
           }
           if (payload.endsWith('/')) payload = payload.slice(0, -1);
-          try { payload = decodeURIComponent(payload); } catch { }
+          try {
+            payload = decodeURIComponent(payload);
+          } catch {}
 
           // Check for search action
           if (payload.startsWith('search/')) {
@@ -292,7 +325,8 @@ export function PopupManager() {
         if (isWorldId || isUrl) {
           // Show toast for feedback
           toast.info(t('add-world-dialog:resolving-url'), {
-            description: payload.substring(0, 50) + (payload.length > 50 ? '...' : '')
+            description:
+              payload.substring(0, 50) + (payload.length > 50 ? '...' : ''),
           });
           await processUrl(payload);
           return; // Stop after finding one valid link
@@ -301,10 +335,9 @@ export function PopupManager() {
     });
 
     return () => {
-      unlisten.then(f => f());
+      unlisten.then((f) => f());
     };
   }, []);
-
 
   return (
     <>
@@ -312,7 +345,10 @@ export function PopupManager() {
         <AddToFolderDialog
           selectedWorlds={showAddToFolder}
           currentFolder={currentFolder}
-          onClose={() => setPopup('showAddToFolder', null)}
+          onClose={() => {
+            setPopup('showAddToFolder', null);
+            setPopup('addToFolderPreRemove', null);
+          }}
         />
       )}
       {showAddWorld && (
@@ -419,7 +455,9 @@ export function PopupManager() {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setPopup('showDNDConfirm', null)}>
+              <AlertDialogCancel
+                onClick={() => setPopup('showDNDConfirm', null)}
+              >
                 {t('general:cancel')}
               </AlertDialogCancel>
               <AlertDialogAction

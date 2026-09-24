@@ -511,10 +511,8 @@ impl FileService {
 
         for world in worlds {
             custom_data.set_world_favorite(&world.api_data.world_id, world.user_data.is_favorite);
-            custom_data.set_world_photographed(
-                &world.api_data.world_id,
-                world.user_data.is_photographed,
-            );
+            custom_data
+                .set_world_photographed(&world.api_data.world_id, world.user_data.is_photographed);
             custom_data.set_world_shared(&world.api_data.world_id, world.user_data.is_shared);
         }
 
@@ -639,7 +637,7 @@ impl FileService {
                 log::warn!("Failed to read file {:?}: {}", path, e);
                 FileError::FileNotFound
             })?;
-            
+
             if Self::is_file_corrupted_with_null_bytes(&data) {
                 log::warn!("File {:?} is corrupted (null bytes)", path);
                 return Err(FileError::InvalidFile);
@@ -653,25 +651,33 @@ impl FileService {
 
         match parse_file(&custom_data_path) {
             Ok(data) => {
-                log::info!("Successfully loaded custom_data.json. Favorites: {}", data.world_favorites.len());
+                log::info!(
+                    "Successfully loaded custom_data.json. Favorites: {}",
+                    data.world_favorites.len()
+                );
                 data
-            },
+            }
             Err(_) => {
                 log::error!("Failed to read primary custom_data.json, attempting backup...");
                 let backup_path = Self::get_backup_path(&custom_data_path);
                 if backup_path.exists() {
-                     match parse_file(&backup_path) {
+                    match parse_file(&backup_path) {
                         Ok(data) => {
-                            log::info!("Successfully recovered custom_data from backup. Favorites: {}", data.world_favorites.len());
+                            log::info!(
+                                "Successfully recovered custom_data from backup. Favorites: {}",
+                                data.world_favorites.len()
+                            );
                             // Restore backup
                             Self::restore_backup_to_primary(&backup_path, &custom_data_path);
                             data
-                        },
+                        }
                         Err(_) => {
-                            log::error!("Failed to recover custom_data from backup. Returning empty.");
+                            log::error!(
+                                "Failed to recover custom_data from backup. Returning empty."
+                            );
                             CustomData::new()
                         }
-                     }
+                    }
                 } else {
                     log::error!("No backup found for custom_data.json. Returning empty.");
                     CustomData::new()

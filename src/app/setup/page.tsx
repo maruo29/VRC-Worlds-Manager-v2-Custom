@@ -535,6 +535,7 @@ const WelcomePage: React.FC = () => {
                         thumbnailUrl: '/icons/1.png',
                         authorName: t('general:author'),
                         lastUpdated: '2017-03-09',
+                        publicationDate: null,
                         visits: 616,
                         dateAdded: '2025-01-01',
                         favorites: 59,

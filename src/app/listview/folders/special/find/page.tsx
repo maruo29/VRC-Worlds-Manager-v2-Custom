@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useLocalization } from '@/hooks/use-localization';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -39,6 +39,16 @@ import {
 } from '@/components/ui/tooltip';
 import { onOpenUrl } from '@tauri-apps/plugin-deep-link';
 import { useFolders } from '@/app/listview/hook/use-folders';
+import { useRelatedWorldsStore } from '@/app/listview/hook/use-related-worlds';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@/components/ui/badge';
+import { X, Download, Upload } from 'lucide-react';
+import {
+  buildSnapshot,
+  loadSnapshot,
+  saveSnapshot,
+  type SearchSnapshot,
+} from '@/lib/search-snapshot';
 
 export default function FindWorldsPage() {
   const searchParams = useSearchParams();
@@ -94,7 +104,9 @@ export default function FindWorldsPage() {
   const { importFolder } = useFolders();
 
   // Fetch all local worlds to map status
-  const [localWorldsMap, setLocalWorldsMap] = useState<Map<string, WorldDisplayData>>(new Map());
+  const [localWorldsMap, setLocalWorldsMap] = useState<
+    Map<string, WorldDisplayData>
+  >(new Map());
 
   // Function to refresh local worlds map and return it
   const refreshLocalWorldsMap = useCallback(async () => {
@@ -202,6 +214,78 @@ export default function FindWorldsPage() {
   // Add this state variable to track if a search has been performed
   const [hasSearched, setHasSearched] = useState(false);
 
+  // "Base worlds" come from the related-worlds feature. When they are set, the
+  // search results are re-ordered by how close they are to those worlds, so a
+  // query and a reference world can be combined instead of used separately.
+  const {
+    seeds: relatedSeeds,
+    rankAgainstSeeds,
+    clearSeeds: clearRelatedSeeds,
+  } = useRelatedWorldsStore();
+  const [useRelatedRanking, setUseRelatedRanking] = useState(true);
+
+  // A loaded snapshot takes over the results area until it is closed.
+  const [snapshot, setSnapshot] = useState<SearchSnapshot | null>(null);
+
+  const handleExportResults = async () => {
+    try {
+      const saved = await saveSnapshot(
+        buildSnapshot(
+          'find',
+          searchQuery || selectedTags.join(', ') || 'search',
+          {
+            query: searchQuery,
+            tags: selectedTags,
+            excludeTags: selectedExcludedTags,
+            sort: selectedSort,
+            baseWorlds: relatedSeeds.map((seed) => seed.name),
+          },
+          searchResults,
+        ),
+      );
+      if (saved) toast(t('snapshot:saved'));
+    } catch (e) {
+      error(`Snapshot export failed: ${e}`);
+      toast(t('general:error-title'), { description: String(e) });
+    }
+  };
+
+  const handleImportResults = async () => {
+    try {
+      const loaded = await loadSnapshot();
+      if (loaded) {
+        setSnapshot(loaded);
+        setActiveTab('search');
+        toast(t('snapshot:loaded'));
+      }
+    } catch (e) {
+      error(`Snapshot import failed: ${e}`);
+      toast(t('general:error-title'), { description: String(e) });
+    }
+  };
+
+  const rankedSearchResults = useMemo(() => {
+    if (relatedSeeds.length === 0 || !useRelatedRanking) {
+      return { worlds: searchResults, badges: {} as Record<string, string> };
+    }
+
+    const ranked = rankAgainstSeeds(searchResults);
+    const badges: Record<string, string> = {};
+    for (const entry of ranked) {
+      const parts: string[] = [];
+      if (entry.sameAuthor) parts.push(t('related-page:same-author'));
+      if (entry.sameGenre) parts.push(t('related-page:same-genre'));
+      if (entry.matchedTags.length > 0) {
+        const shown = entry.matchedTags.slice(0, 2).join(', ');
+        const rest = entry.matchedTags.length - 2;
+        parts.push(rest > 0 ? `${shown} +${rest}` : shown);
+      }
+      if (parts.length > 0) badges[entry.world.worldId] = parts.join(' / ');
+    }
+
+    return { worlds: ranked.map((entry) => entry.world), badges };
+  }, [searchResults, relatedSeeds, useRelatedRanking, rankAgainstSeeds, t]);
+
   // Track if we've already processed the query params (to avoid re-triggering)
   const [hasProcessedUrlParams, setHasProcessedUrlParams] = useState(false);
 
@@ -220,7 +304,7 @@ export default function FindWorldsPage() {
 
   // Fetch recently visited worlds on initial load
   useEffect(() => {
-    // Only fetch if empty and not loading. 
+    // Only fetch if empty and not loading.
     // Optimization: Also could check if we have map loaded?
     // refreshLocalWorldsMap is called in fetchRecentlyVisitedWorlds anyway.
     if (recentlyVisitedWorlds.length === 0 && !isLoading) {
@@ -252,6 +336,27 @@ export default function FindWorldsPage() {
 
     const queryParam = searchParams.get('q');
     const autoSearch = searchParams.get('autoSearch');
+    const tagsParam = searchParams.get('tags');
+
+    // Handed over from the related-worlds page: prefill its tags and search.
+    if (tagsParam && autoSearch === 'true') {
+      const tags = tagsParam
+        .split(',')
+        .map((tag) => tag.trim())
+        .filter(Boolean)
+        .slice(0, 5);
+
+      info(`Auto-search triggered from related tags: ${tags.join(', ')}`);
+      setHasProcessedUrlParams(true);
+      setActiveTab('search');
+      setSelectedTags(tags);
+      router.replace('/listview/folders/special/find', { scroll: false });
+
+      setTimeout(() => {
+        handleSearchWithTags(tags);
+      }, 100);
+      return;
+    }
 
     if (queryParam && autoSearch === 'true') {
       info(`Auto-search triggered from URL params: ${queryParam}`);
@@ -272,6 +377,31 @@ export default function FindWorldsPage() {
       }, 100);
     }
   }, [searchParams, hasProcessedUrlParams, router]);
+
+  /** Tag-only search used when the related page hands its tags over. */
+  const handleSearchWithTags = async (tags: string[]) => {
+    setHasSearched(true);
+    setIsSearching(true);
+    setCurrentPage(1);
+    setSearchResults([]);
+    setHasMoreResults(true);
+
+    try {
+      const result = await commands.searchWorlds('popularity', tags, [], '', 1);
+
+      if (result.status === 'ok') {
+        setSearchResults(result.data);
+        setHasMoreResults(result.data.length > 0);
+      } else {
+        error(`Tag search failed: ${result.error}`);
+        toast(t('general:error-title'), { description: result.error });
+      }
+    } catch (e) {
+      error(`Tag search failed: ${e}`);
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   // Separate function for URL-triggered search to avoid dependency issues
   const handleSearchFromUrl = async (query: string) => {
@@ -360,7 +490,7 @@ export default function FindWorldsPage() {
                 folders: localData.folders,
                 isFavorite: localData.isFavorite,
                 isPhotographed: localData.isPhotographed,
-                // prefer local data for mutable fields if needed, 
+                // prefer local data for mutable fields if needed,
                 // but search result might be more up to date for visits/etc.
                 // keeping search result metadata but overlaying user status
               };
@@ -479,13 +609,33 @@ export default function FindWorldsPage() {
             variant="outline"
             onClick={fetchRecentlyVisitedWorlds}
             disabled={activeTab !== 'recently-visited' || isLoading}
-            className={`ml-2 flex items-center gap-2 ${activeTab !== 'recently-visited' ? 'invisible' : ''
-              }`}
+            className={`ml-2 flex items-center gap-2 ${
+              activeTab !== 'recently-visited' ? 'invisible' : ''
+            }`}
           >
             <RefreshCw
               className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`}
             />
             <span>{t('general:fetch-refresh')}</span>
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="ml-2 h-9 w-9"
+            title={t('snapshot:export')}
+            onClick={handleExportResults}
+            disabled={searchResults.length === 0}
+          >
+            <Download className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="ml-2 h-9 w-9"
+            title={t('snapshot:import')}
+            onClick={handleImportResults}
+          >
+            <Upload className="h-4 w-4" />
           </Button>
           <Button
             variant={isSelectionMode ? 'secondary' : 'ghost'}
@@ -498,8 +648,9 @@ export default function FindWorldsPage() {
                 toggleSelectionMode();
               }
             }}
-            className={`ml-2 h-9 w-9 ${activeTab !== 'recently-visited' ? 'invisible' : ''
-              }`}
+            className={`ml-2 h-9 w-9 ${
+              activeTab !== 'recently-visited' ? 'invisible' : ''
+            }`}
           >
             {isSelectionMode ? (
               <CheckSquare className="h-4 w-4" />
@@ -544,7 +695,9 @@ export default function FindWorldsPage() {
                 containerRef={findGridRef}
                 onWorldUpdate={(worldId, updates) => {
                   setRecentlyVisitedWorlds((prev) =>
-                    prev.map((w) => (w.worldId === worldId ? { ...w, ...updates } : w)),
+                    prev.map((w) =>
+                      w.worldId === worldId ? { ...w, ...updates } : w,
+                    ),
                   );
                   setLocalWorldsMap((prevMap) => {
                     const newMap = new Map(prevMap);
@@ -726,6 +879,68 @@ export default function FindWorldsPage() {
               </Card>
             </div>
 
+            {relatedSeeds.length > 0 && (
+              <div className="px-4 pt-2 flex items-center gap-2 flex-wrap">
+                <span className="text-xs text-muted-foreground shrink-0">
+                  {t('find-page:related-base')}
+                </span>
+                {relatedSeeds.map((seed) => (
+                  <Badge
+                    key={seed.worldId}
+                    variant="secondary"
+                    className="cursor-default max-w-[240px] truncate"
+                    title={`${seed.name} / ${seed.authorName}`}
+                  >
+                    {seed.name}
+                  </Badge>
+                ))}
+                <div className="flex items-center gap-2 ml-2">
+                  <Checkbox
+                    id="use-related-ranking"
+                    checked={useRelatedRanking}
+                    onCheckedChange={(checked) =>
+                      setUseRelatedRanking(checked === true)
+                    }
+                  />
+                  <label
+                    htmlFor="use-related-ranking"
+                    className="text-xs text-muted-foreground cursor-pointer"
+                  >
+                    {t('find-page:use-related-ranking')}
+                  </label>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2"
+                  onClick={clearRelatedSeeds}
+                >
+                  <X className="h-3 w-3 mr-1" />
+                  {t('find-page:clear-related-base')}
+                </Button>
+              </div>
+            )}
+
+            {snapshot && (
+              <div className="px-4 pt-2 flex items-center gap-2 flex-wrap">
+                <span className="text-xs text-muted-foreground">
+                  {t(
+                    'snapshot:viewing',
+                    new Date(snapshot.savedAt).toLocaleString(),
+                    snapshot.label,
+                  )}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2"
+                  onClick={() => setSnapshot(null)}
+                >
+                  {t('snapshot:close')}
+                </Button>
+              </div>
+            )}
+
             <div className="flex flex-col gap-4 p-4">
               {/* original search tab content */}
               {/* Search results */}
@@ -733,14 +948,22 @@ export default function FindWorldsPage() {
                 {hasSearched && searchResults.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-8 text-center">
                     <Search className="w-12 h-12 mb-4 opacity-20" />
-                    <p className="text-lg font-medium">{t('listview-page:no-search-results')}</p>
-                    <p className="text-sm mt-2">{t('listview-page:try-different-keywords')}</p>
+                    <p className="text-lg font-medium">
+                      {t('listview-page:no-search-results')}
+                    </p>
+                    <p className="text-sm mt-2">
+                      {t('listview-page:try-different-keywords')}
+                    </p>
                   </div>
                 ) : !hasSearched && searchResults.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-8 text-center">
                     <Search className="w-12 h-12 mb-4 opacity-20" />
-                    <p className="text-lg font-medium">{t('listview-page:start-search-title')}</p>
-                    <p className="text-sm mt-2">{t('listview-page:start-search-description')}</p>
+                    <p className="text-lg font-medium">
+                      {t('listview-page:start-search-title')}
+                    </p>
+                    <p className="text-sm mt-2">
+                      {t('listview-page:start-search-description')}
+                    </p>
                   </div>
                 ) : (
                   <>
@@ -750,25 +973,40 @@ export default function FindWorldsPage() {
                     {searchResults.length > 0 && (
                       <>
                         <WorldGrid
-                          worlds={searchResults}
+                          worlds={
+                            snapshot
+                              ? snapshot.worlds
+                              : rankedSearchResults.worlds
+                          }
                           currentFolder={SpecialFolders.Find}
                           containerRef={findGridRef}
+                          extraBadges={rankedSearchResults.badges}
                           onWorldUpdate={(worldId, updates) => {
                             setSearchResults((prev) =>
-                              prev.map((w) => (w.worldId === worldId ? { ...w, ...updates } : w)),
+                              prev.map((w) =>
+                                w.worldId === worldId
+                                  ? { ...w, ...updates }
+                                  : w,
+                              ),
                             );
                             setLocalWorldsMap((prevMap) => {
                               const newMap = new Map(prevMap);
                               const existing = newMap.get(worldId);
                               if (existing) {
-                                newMap.set(worldId, { ...existing, ...updates });
+                                newMap.set(worldId, {
+                                  ...existing,
+                                  ...updates,
+                                });
                               }
                               return newMap;
                             });
                           }}
                         />
 
-                        <div ref={loadMoreRef} className="p-4 flex justify-center shrink-0">
+                        <div
+                          ref={loadMoreRef}
+                          className="p-4 flex justify-center shrink-0"
+                        >
                           {isLoadingMore ? (
                             <div className="w-full max-w-screen-lg">
                               <WorldGridSkeleton count={6} />

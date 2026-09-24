@@ -57,8 +57,10 @@ export function WorldFolderPage(props: WorldFolderPageProps) {
 
   return (
     <div className="flex h-screen">
-      <div ref={gridScrollRef} className="flex-1 flex flex-col overflow-auto">
-        <div className="p-4 flex justify-between items-center">
+      {/* The grid is the scroller, so the header and search bar stay put and
+          the virtualized list has a definite height to work against. */}
+      <div className="flex-1 flex flex-col overflow-hidden min-h-0">
+        <div className="p-4 flex justify-between items-center shrink-0">
           <h1 className="text-xl font-bold truncate">{title}</h1>
           <div className="flex items-center">
             {isSelectionMode && filteredWorlds.length > 0 && (
@@ -83,23 +85,23 @@ export function WorldFolderPage(props: WorldFolderPageProps) {
             })}
           </div>
         </div>
-        <div>
+        <div className="shrink-0">
           <SearchBar currentFolder={folderId} />
-          <div className="flex-1">
-            {isLoading && worlds.length === 0 ? (
-              <WorldGridSkeleton />
-            ) : filteredWorlds.length === 0 ? (
-              <div className="p-8 text-center text-muted-foreground">
-                {worlds.length === 0 ? emptyAllMessage : emptyFilteredMessage}
-              </div>
-            ) : (
-              <WorldGrid
-                worlds={filteredWorlds}
-                currentFolder={folderId}
-                containerRef={gridScrollRef}
-              />
-            )}
-          </div>
+        </div>
+        <div className="flex-1 flex flex-col min-h-0">
+          {isLoading && worlds.length === 0 ? (
+            <WorldGridSkeleton />
+          ) : filteredWorlds.length === 0 ? (
+            <div className="p-8 text-center text-muted-foreground">
+              {worlds.length === 0 ? emptyAllMessage : emptyFilteredMessage}
+            </div>
+          ) : (
+            <WorldGrid
+              worlds={filteredWorlds}
+              currentFolder={folderId}
+              containerRef={gridScrollRef}
+            />
+          )}
         </div>
 
         {visibleSelectedWorlds.length > 0 && (

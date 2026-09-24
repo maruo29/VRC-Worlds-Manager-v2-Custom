@@ -1,4 +1,4 @@
-mod common;
+pub mod common;
 mod definitions;
 #[cfg(test)]
 mod tests;

@@ -526,6 +526,34 @@ impl ApiService {
         }
     }
 
+    /// Fetches the public worlds of a single author.
+    pub async fn search_worlds_by_author(
+        cookie_store: Arc<Jar>,
+        user_id: String,
+        page: usize,
+    ) -> Result<Vec<WorldDisplayData>, String> {
+        let mut parameter_builder = WorldSearchParametersBuilder::new();
+        parameter_builder.user_id = Some(user_id);
+
+        match world::search_worlds(cookie_store, &parameter_builder.build(), page).await {
+            Ok(worlds) => {
+                let converted_worlds = worlds
+                    .into_iter()
+                    .map(|world| world.try_into())
+                    .collect::<Result<Vec<_>, _>>();
+
+                match converted_worlds {
+                    Ok(worlds_vec) => Ok(worlds_vec),
+                    Err(e) => {
+                        log::info!("Failed to convert worlds: {}", e);
+                        Err(format!("Failed to convert worlds: {}", e))
+                    }
+                }
+            }
+            Err(e) => Err(format!("Failed to fetch worlds: {}", e)),
+        }
+    }
+
     /// Creates a new instance of a world
     ///
     /// # Arguments
@@ -548,6 +576,53 @@ impl ApiService {
         cookie_store: Arc<Jar>,
         user_id: String,
         app: AppHandle,
+    ) -> Result<InstanceInfo, String> {
+        Self::create_world_instance_inner(
+            world_id,
+            instance_type_str,
+            region_str,
+            cookie_store,
+            user_id,
+            app,
+            true,
+        )
+        .await
+    }
+
+    /// Creates an instance without also inviting the user to it.
+    ///
+    /// The self-invite exists so the instance can be reached from VRChat's
+    /// notification list, but it means a launch URL arrives as a notification
+    /// to accept. Skipping it leaves the launch URL to open the instance's
+    /// own page with its Enter button, which is one step rather than two.
+    pub async fn create_world_instance_without_invite(
+        world_id: String,
+        instance_type_str: String,
+        region_str: String,
+        cookie_store: Arc<Jar>,
+        user_id: String,
+        app: AppHandle,
+    ) -> Result<InstanceInfo, String> {
+        Self::create_world_instance_inner(
+            world_id,
+            instance_type_str,
+            region_str,
+            cookie_store,
+            user_id,
+            app,
+            false,
+        )
+        .await
+    }
+
+    async fn create_world_instance_inner(
+        world_id: String,
+        instance_type_str: String,
+        region_str: String,
+        cookie_store: Arc<Jar>,
+        user_id: String,
+        app: AppHandle,
+        send_self_invite: bool,
     ) -> Result<InstanceInfo, String> {
         log::info!(
             "Creating instance: {} {} {}",
@@ -602,15 +677,17 @@ impl ApiService {
         // Call API endpoint
         match instance::create_instance(cookie_store.clone(), request).await {
             Ok(_instance) => {
-                // Invite self to the instance
                 let instance_id = _instance.instance_id.clone();
                 let world_id = _instance.world_id.clone();
-                Self::invite_self_to_instance(
-                    cookie_store.clone(),
-                    world_id.clone(),
-                    instance_id.clone(),
-                )
-                .await?;
+
+                if send_self_invite {
+                    Self::invite_self_to_instance(
+                        cookie_store.clone(),
+                        world_id.clone(),
+                        instance_id.clone(),
+                    )
+                    .await?;
+                }
 
                 // Do NOT fetch the short name here. Frontend will request it when user chooses to open in client.
                 Ok(InstanceInfo {

@@ -85,6 +85,7 @@ pub fn run() {
     tauri_builder = tauri_builder.plugin(tauri_plugin_deep_link::init());
 
     tauri_builder
+        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
@@ -143,6 +144,9 @@ pub fn run() {
             if let Err(e) = initialize_app() {
                 log::error!("Failed to initialize app: {}", e);
             }
+
+            // For the browser extension; answers 503 until the library loads.
+            services::LibraryBridgeService::start();
 
             Ok(())
         })

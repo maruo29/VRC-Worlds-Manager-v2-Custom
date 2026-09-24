@@ -2,7 +2,16 @@
 
 import { SaturnIcon } from '../../../components/icons/saturn-icon';
 import { GearIcon } from '../../../components/icons/gear-icon';
-import { Info, FileQuestion, History, Plus, Folder } from 'lucide-react';
+import {
+  Info,
+  FileQuestion,
+  History,
+  Plus,
+  Folder,
+  Sparkles,
+  Star,
+  CheckSquare,
+} from 'lucide-react';
 import { SpecialFolders } from '@/types/folders';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { FolderData } from '@/lib/bindings';
@@ -26,6 +35,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { useFolders } from '@/app/listview/hook/use-folders';
+import { useQuickFolderStore } from '@/app/listview/hook/use-quick-folder';
 import { useRouter } from 'next/navigation';
 import { usePathname } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
@@ -63,8 +73,15 @@ interface AppSidebarProps {
 
 export function AppSidebar({ sidebarWidth }: AppSidebarProps) {
   const { t } = useLocalization();
-  const { folders, moveFolder, createFolder, deleteFolder, renameFolder, setFolderColor } =
-    useFolders();
+  const {
+    folders,
+    isLoading,
+    moveFolder,
+    createFolder,
+    deleteFolder,
+    renameFolder,
+    setFolderColor,
+  } = useFolders();
   const setPopup = usePopupStore((state) => state.setPopup);
 
   const [localFolders, setLocalFolders] = useState<FolderData[]>(folders);
@@ -84,19 +101,174 @@ export function AppSidebar({ sidebarWidth }: AppSidebarProps) {
     setLocalFolders(folders);
   }, [folders]);
 
+  const {
+    isEnabled: isQuickFolderEnabled,
+    name: quickFolderName,
+    isLoaded: isQuickFolderLoaded,
+    isEnsured: isQuickFolderEnsured,
+    isStatusEnabled,
+    libraryItemOrder,
+    setLibraryItemOrder,
+    load: loadQuickFolder,
+    markEnsured: markQuickFolderEnsured,
+    setName: setQuickFolderName,
+  } = useQuickFolderStore();
+
+  useEffect(() => {
+    loadQuickFolder();
+  }, [loadQuickFolder]);
+
+  // The quick folder is a real folder, so it has to exist before anything can
+  // be added to it. Create it once, pinned to the top of the list.
+  useEffect(() => {
+    if (!isQuickFolderLoaded || !isQuickFolderEnabled) return;
+    if (isQuickFolderEnsured || isLoading || !quickFolderName) return;
+    if (folders.some((folder) => folder.name === quickFolderName)) {
+      markQuickFolderEnsured();
+      return;
+    }
+
+    const createQuickFolder = async () => {
+      try {
+        await createFolder(quickFolderName);
+        await moveFolder(quickFolderName, 0);
+        markQuickFolderEnsured();
+      } catch (e) {
+        error(`Failed to create the quick folder: ${e}`);
+      }
+    };
+
+    createQuickFolder();
+  }, [
+    isQuickFolderLoaded,
+    isQuickFolderEnabled,
+    isQuickFolderEnsured,
+    isLoading,
+    quickFolderName,
+    folders,
+  ]);
+
+  // The quick folder lives in the library section rather than in the draggable
+  // list, so it is always pulled out of that list - which means drag indexes
+  // from the visible list have to be mapped back onto the real folder order.
+  const hiddenQuickFolderIndex = quickFolderName
+    ? localFolders.findIndex((folder) => folder.name === quickFolderName)
+    : -1;
+
+  const quickFolderPath = `/listview/folders/userFolder?folderName=${encodeURIComponent(
+    quickFolderName,
+  )}`;
+  const quickFolderWorldCount =
+    localFolders.find((folder) => folder.name === quickFolderName)
+      ?.world_count ?? 0;
+
+  const toRealFolderIndex = (visibleIndex: number) =>
+    hiddenQuickFolderIndex >= 0 && visibleIndex >= hiddenQuickFolderIndex
+      ? visibleIndex + 1
+      : visibleIndex;
+
+  const visibleFolders =
+    hiddenQuickFolderIndex >= 0
+      ? localFolders.filter((folder) => folder.name !== quickFolderName)
+      : localFolders;
+
+  /** Built-in library entries, in the order the user arranged them. */
+  const libraryItemDefs: {
+    id: string;
+    label: string;
+    href: string;
+    icon: React.ReactNode;
+    badge?: number;
+    isActive: boolean;
+    isVisible: boolean;
+  }[] = [
+    {
+      id: 'quick',
+      label: quickFolderName,
+      href: quickFolderPath,
+      icon: <CheckSquare className="h-5 w-5" />,
+      badge: quickFolderWorldCount,
+      isActive:
+        pathname === '/listview/folders/userFolder' &&
+        searchParams.get('folderName') === quickFolderName,
+      isVisible: isQuickFolderEnabled && !!quickFolderName,
+    },
+    {
+      id: 'all',
+      label: t('general:all-worlds'),
+      href: '/listview/folders/special/all',
+      icon: <SaturnIcon className="h-[18px] w-[18px]" />,
+      isActive: pathname === '/listview/folders/special/all',
+      isVisible: true,
+    },
+    {
+      id: 'status',
+      label: t('general:status-worlds'),
+      href: '/listview/folders/special/status',
+      icon: <Star className="h-5 w-5" />,
+      isActive: pathname === '/listview/folders/special/status',
+      isVisible: isStatusEnabled,
+    },
+    {
+      id: 'unclassified',
+      label: t('general:unclassified-worlds'),
+      href: '/listview/folders/special/unclassified',
+      icon: <FileQuestion className="h-5 w-5" />,
+      isActive: pathname === '/listview/folders/special/unclassified',
+      isVisible: true,
+    },
+    {
+      id: 'folderView',
+      label: t('general:folder-view'),
+      href: '/listview/folders/special/folder-view',
+      icon: <Folder className="h-5 w-5" />,
+      isActive: pathname === '/listview/folders/special/folder-view',
+      isVisible: true,
+    },
+  ];
+
+  const libraryItems = (() => {
+    const byId = new Map(libraryItemDefs.map((item) => [item.id, item]));
+    const ordered = libraryItemOrder
+      .map((id) => byId.get(id))
+      .filter((item): item is (typeof libraryItemDefs)[number] => !!item);
+    // Anything the saved order does not mention (a newly added entry) keeps
+    // its default position at the end.
+    for (const item of libraryItemDefs) {
+      if (!ordered.includes(item)) ordered.push(item);
+    }
+    return ordered.filter((item) => item.isVisible);
+  })();
+
+  const handleLibraryDragEnd = (result: any) => {
+    if (!result.destination) return;
+
+    const visibleIds = libraryItems.map((item) => item.id);
+    const [moved] = visibleIds.splice(result.source.index, 1);
+    visibleIds.splice(result.destination.index, 0, moved);
+
+    // Hidden entries keep their relative position at the end of the list.
+    const hiddenIds = libraryItemDefs
+      .filter((item) => !item.isVisible)
+      .map((item) => item.id);
+    setLibraryItemOrder([...visibleIds, ...hiddenIds]);
+  };
+
   const handleDragEnd = async (result: any) => {
     if (!result.destination) return;
 
     const { source, destination } = result;
+    const realSource = toRealFolderIndex(source.index);
+    const realDestination = toRealFolderIndex(destination.index);
     const newFolders = Array.from(localFolders);
-    const [movedFolder] = newFolders.splice(source.index, 1);
-    newFolders.splice(destination.index, 0, movedFolder);
+    const [movedFolder] = newFolders.splice(realSource, 1);
+    newFolders.splice(realDestination, 0, movedFolder);
 
     // Update local state immediately
     setLocalFolders(newFolders);
 
     try {
-      moveFolder(movedFolder.name, destination.index);
+      moveFolder(movedFolder.name, realDestination);
     } catch (e) {
       // Revert on error
       setLocalFolders(folders);
@@ -108,6 +280,11 @@ export function AppSidebar({ sidebarWidth }: AppSidebarProps) {
     const oldName = folder;
     const newName = newFolderName;
     renameFolder(oldName, newName).then(() => {
+      // Otherwise the stored name goes stale and an empty quick folder gets
+      // recreated on the next launch.
+      if (oldName === quickFolderName && newName) {
+        setQuickFolderName(newName);
+      }
       setEditingFolder(null);
       setNewFolderName('');
       // If currently viewing this user folder, update the URL so the page title reflects the rename
@@ -213,6 +390,9 @@ export function AppSidebar({ sidebarWidth }: AppSidebarProps) {
 
       <nav className={sidebarStyles.nav}>
         <SidebarGroup>
+          <div className="px-3 pt-1 pb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+            {t('general:section-discover')}
+          </div>
           <div
             className={`
               px-3 py-2 text-sm font-medium rounded-lg cursor-pointer
@@ -229,65 +409,79 @@ export function AppSidebar({ sidebarWidth }: AppSidebarProps) {
               {t('general:find-worlds')}
             </span>
           </div>
+
+          <div
+            className={`
+              px-3 py-2 text-sm font-medium rounded-lg cursor-pointer
+              overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-3
+              ${pathname === '/listview/folders/special/recommend' ? sidebarStyles.activeLink : 'hover:bg-accent/50 hover:text-accent-foreground'}
+            `}
+            onClick={() => {
+              if (pathname === '/listview/folders/special/recommend') return;
+              router.push('/listview/folders/special/recommend');
+            }}
+          >
+            <Sparkles className="h-5 w-5" />
+            <span className="text-sm font-medium">
+              {t('general:recommend-worlds')}
+            </span>
+          </div>
         </SidebarGroup>
         <Separator className="my-2" />
         <SidebarGroup>
-          <div
-            className={`
-              px-3 py-2 text-sm font-medium rounded-lg cursor-pointer
-              overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-3
-              ${pathname === '/listview/folders/special/all' ? sidebarStyles.activeLink : 'hover:bg-accent/50 hover:text-accent-foreground'}
-            `}
-            onClick={() => {
-              if (pathname === '/listview/folders/special/all') return;
-              router.push('/listview/folders/special/all');
-            }}
-          >
-            <SaturnIcon className="h-[18px] w-[18px]" />
-            <span className="text-sm font-medium">
-              {t('general:all-worlds')}
-            </span>
+          <div className="px-3 pt-1 pb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+            {t('general:section-library')}
           </div>
 
-          <div
-            className={`
-              px-3 py-2 text-sm font-medium rounded-lg cursor-pointer
-              overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-3
-              ${pathname === '/listview/folders/special/unclassified'
-                ? sidebarStyles.activeLink
-                : 'hover:bg-accent/50 hover:text-accent-foreground'
-              }
-            `}
-            onClick={() => {
-              if (pathname === '/listview/folders/special/unclassified') return;
-              router.push('/listview/folders/special/unclassified');
-            }}
-          >
-            <FileQuestion className="h-5 w-5" />
-            <span className="text-sm font-medium">
-              {t('general:unclassified-worlds')}
-            </span>
-          </div>
-
-          <div
-            className={`
-              px-3 py-2 text-sm font-medium rounded-lg cursor-pointer
-              overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-3
-              ${pathname === '/listview/folders/special/folder-view'
-                ? sidebarStyles.activeLink
-                : 'hover:bg-accent/50 hover:text-accent-foreground'
-              }
-            `}
-            onClick={() => {
-              if (pathname === '/listview/folders/special/folder-view') return;
-              router.push('/listview/folders/special/folder-view');
-            }}
-          >
-            <Folder className="h-5 w-5" />
-            <span className="text-sm font-medium">
-              {t('general:folder-view')}
-            </span>
-          </div>
+          <DragDropContext onDragEnd={handleLibraryDragEnd}>
+            <Droppable droppableId="library-items">
+              {(provided) => (
+                <div ref={provided.innerRef} {...provided.droppableProps}>
+                  {libraryItems.map((item, index) => (
+                    <Draggable
+                      key={item.id}
+                      draggableId={`library-${item.id}`}
+                      index={index}
+                    >
+                      {(dragProvided, snapshot) => (
+                        <div
+                          ref={dragProvided.innerRef}
+                          {...dragProvided.draggableProps}
+                          {...dragProvided.dragHandleProps}
+                          style={dragProvided.draggableProps.style}
+                          className={`
+                            px-3 py-2 text-sm font-medium rounded-lg cursor-pointer
+                            overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-3
+                            ${snapshot.isDragging ? 'bg-accent shadow-lg' : ''}
+                            ${
+                              item.isActive
+                                ? sidebarStyles.activeLink
+                                : 'hover:bg-accent/50 hover:text-accent-foreground'
+                            }
+                          `}
+                          onClick={() => {
+                            if (item.isActive) return;
+                            router.push(item.href);
+                          }}
+                        >
+                          {item.icon}
+                          <span className="text-sm font-medium flex-1 truncate">
+                            {item.label}
+                          </span>
+                          {item.badge !== undefined && (
+                            <span className="font-mono text-xs text-muted-foreground">
+                              {item.badge}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
         </SidebarGroup>
         <Separator className="my-2" />
         <SidebarGroup>
@@ -302,7 +496,7 @@ export function AppSidebar({ sidebarWidth }: AppSidebarProps) {
                   {...provided.droppableProps}
                   className="h-[calc(100vh-417px)] overflow-x-clip overflow-y-scroll no-webview-scroll-bar pl-8"
                 >
-                  {localFolders.map((folder, index) => (
+                  {visibleFolders.map((folder, index) => (
                     <Draggable
                       key={folder.name}
                       draggableId={folder.name}
@@ -321,10 +515,11 @@ export function AppSidebar({ sidebarWidth }: AppSidebarProps) {
                             px-3 py-2 text-sm font-medium rounded-lg cursor-grab
                             overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-3
                             ${snapshot.isDragging ? 'bg-accent shadow-lg' : ''}
-                            ${pathname ===
+                            ${
+                              pathname ===
                               `/listview/folders/userFolder?folderName=${folder.name}`
-                              ? sidebarStyles.activeLink
-                              : 'hover:bg-accent/50 hover:text-accent-foreground'
+                                ? sidebarStyles.activeLink
+                                : 'hover:bg-accent/50 hover:text-accent-foreground'
                             }
                           `}
                         >
@@ -438,7 +633,9 @@ export function AppSidebar({ sidebarWidth }: AppSidebarProps) {
                                 </ContextMenuSubTrigger>
                                 <ContextMenuSubContent className="w-48">
                                   <ContextMenuItem
-                                    onClick={() => setFolderColor(folder.name, null)}
+                                    onClick={() =>
+                                      setFolderColor(folder.name, null)
+                                    }
                                   >
                                     <span className="flex items-center gap-2">
                                       <span className="w-4 h-4 rounded-full border border-border bg-transparent" />
@@ -455,7 +652,9 @@ export function AppSidebar({ sidebarWidth }: AppSidebarProps) {
                                       <span className="flex items-center gap-2">
                                         <span
                                           className="w-4 h-4 rounded-full"
-                                          style={{ backgroundColor: color.value }}
+                                          style={{
+                                            backgroundColor: color.value,
+                                          }}
                                         />
                                         {color.name}
                                       </span>
@@ -498,9 +697,10 @@ export function AppSidebar({ sidebarWidth }: AppSidebarProps) {
           <div
             className={`
               px-3 py-2 cursor-pointer text-sm font-medium rounded-lg overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-3
-              ${pathname === `/listview/about`
-                ? sidebarStyles.activeLink
-                : 'hover:bg-accent/50 hover:text-accent-foreground'
+              ${
+                pathname === `/listview/about`
+                  ? sidebarStyles.activeLink
+                  : 'hover:bg-accent/50 hover:text-accent-foreground'
               }
             `}
             onClick={() => {
@@ -514,9 +714,10 @@ export function AppSidebar({ sidebarWidth }: AppSidebarProps) {
           <div
             className={`
               px-3 py-2 cursor-pointer text-sm font-medium rounded-lg overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-3
-              ${pathname === `/listview/settings`
-                ? sidebarStyles.activeLink
-                : 'hover:bg-accent/50 hover:text-accent-foreground'
+              ${
+                pathname === `/listview/settings`
+                  ? sidebarStyles.activeLink
+                  : 'hover:bg-accent/50 hover:text-accent-foreground'
               }
             `}
             onClick={() => {

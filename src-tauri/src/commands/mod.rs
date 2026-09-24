@@ -7,10 +7,10 @@ pub mod memo_commands;
 pub mod open_folder_commands;
 pub mod patreon_cache;
 pub mod preferences_commands;
-pub mod sort_commands;
 pub mod task;
 pub mod update;
 pub mod util_commands;
+pub mod world_shot_commands;
 pub mod world_status_commands;
 
 use tauri_specta::{collect_commands, Builder};
@@ -70,6 +70,32 @@ pub fn generate_tauri_specta_builder() -> Builder<tauri::Wry> {
         preferences_commands::set_default_instance_type,
         preferences_commands::get_visible_buttons,
         preferences_commands::set_visible_buttons,
+        preferences_commands::get_recommend_manual_tags,
+        preferences_commands::set_recommend_manual_tags,
+        preferences_commands::get_recommend_excluded_tags,
+        preferences_commands::set_recommend_excluded_tags,
+        preferences_commands::get_quick_folder_enabled,
+        preferences_commands::set_quick_folder_enabled,
+        preferences_commands::get_quick_folder_name,
+        preferences_commands::set_quick_folder_name,
+        preferences_commands::get_status_folder_enabled,
+        preferences_commands::set_status_folder_enabled,
+        preferences_commands::get_library_item_order,
+        preferences_commands::set_library_item_order,
+        preferences_commands::get_related_weights,
+        preferences_commands::set_related_weights,
+        preferences_commands::get_startup_page,
+        preferences_commands::set_startup_page,
+        world_shot_commands::capture_world_shot,
+        world_shot_commands::get_world_shots,
+        world_shot_commands::read_world_shot,
+        world_shot_commands::delete_world_shot,
+        world_shot_commands::get_world_shot_storage,
+        world_shot_commands::get_visited_worlds,
+        world_shot_commands::refresh_visited_worlds,
+        world_shot_commands::start_vrchat_log_watch,
+        world_shot_commands::stop_vrchat_log_watch,
+        world_shot_commands::is_vrchat_log_watching,
         api_commands::try_login,
         api_commands::login_with_credentials,
         api_commands::login_with_2fa,
@@ -79,10 +105,16 @@ pub fn generate_tauri_specta_builder() -> Builder<tauri::Wry> {
         api_commands::check_world_info,
         api_commands::get_recently_visited_worlds,
         api_commands::search_worlds,
+        api_commands::search_worlds_by_author,
+        api_commands::get_planetvrc_related,
+        api_commands::get_color_features,
+        api_commands::get_color_analyzed_count,
+        api_commands::analyze_world_colors,
         api_commands::create_world_instance,
         api_commands::get_user_groups,
         api_commands::get_permission_for_create_group_instance,
         api_commands::create_group_instance,
+        api_commands::create_visit_instance,
         api_commands::open_instance_in_client,
         open_folder_commands::open_logs_directory,
         open_folder_commands::open_folder_directory,
@@ -107,8 +139,9 @@ pub fn generate_tauri_specta_builder() -> Builder<tauri::Wry> {
         world_status_commands::set_world_photographed,
         world_status_commands::set_world_shared,
         world_status_commands::set_world_favorite,
-        sort_commands::sort_worlds_display,
         util_commands::resolve_redirects,
         util_commands::get_startup_deep_link,
+        util_commands::save_search_snapshot,
+        util_commands::load_search_snapshot,
     ])
 }

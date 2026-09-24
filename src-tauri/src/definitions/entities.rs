@@ -124,6 +124,10 @@ impl WorldModel {
             author_name: self.api_data.author_name.clone(),
             favorites: self.api_data.favorites,
             last_updated: self.api_data.last_update.format("%Y-%m-%d").to_string(),
+            publication_date: self
+                .api_data
+                .publication_date
+                .map(|date| date.to_rfc3339_opts(SecondsFormat::Millis, true)),
             visits: self.api_data.visits.unwrap_or(0),
             date_added: self
                 .user_data
@@ -173,6 +177,11 @@ pub struct WorldDisplayData {
     pub favorites: i32,
     #[serde(rename = "lastUpdated")]
     pub last_updated: String,
+    /// When the world was first made public, RFC 3339. `None` for worlds
+    /// VRChat reports as unpublished, and for anything saved before this
+    /// field existed. Distinct from `last_updated`, which is the last edit.
+    #[serde(rename = "publicationDate")]
+    pub publication_date: Option<String>,
     pub visits: i32,
     #[serde(rename = "dateAdded")]
     pub date_added: String,
@@ -260,6 +269,12 @@ pub struct FilterItemSelectorStarred {
     pub tag: Vec<String>,
     pub exclude_tag: Vec<String>,
     pub folder: Vec<String>,
+    /// Starred tags for the recommendation settings. Kept apart from the
+    /// search filters so starring in one place does not leak into the other.
+    #[serde(default)]
+    pub recommend_tag: Vec<String>,
+    #[serde(default)]
+    pub recommend_exclude_tag: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, specta::Type)]
@@ -268,6 +283,8 @@ pub enum FilterItemSelectorStarredType {
     Tag,
     ExcludeTag,
     Folder,
+    RecommendTag,
+    RecommendExcludeTag,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, specta::Type, Copy)]
@@ -326,9 +343,7 @@ pub struct PreferenceModel {
     pub card_size: CardSize,
     #[serde(default = "default_region")]
     pub region: InstanceRegion,
-    #[serde(
-        skip_serializing_if = "Option::is_none"
-    )]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub filter_item_selector_starred: Option<FilterItemSelectorStarred>,
     #[serde(
         rename = "dontShowRemoveFromFolder",
@@ -347,6 +362,86 @@ pub struct PreferenceModel {
     pub default_instance_type: DefaultInstanceType,
     #[serde(rename = "visibleButtons", default = "default_visible_buttons", skip)]
     pub visible_buttons: VisibleButtons,
+    /// Tags the user manually pinned as "things I like" for recommendations.
+    #[serde(rename = "recommendManualTags", default)]
+    pub recommend_manual_tags: Vec<String>,
+    /// Tags the user never wants to see in recommendations.
+    #[serde(rename = "recommendExcludedTags", default)]
+    pub recommend_excluded_tags: Vec<String>,
+    /// Show the one-click folder checkbox on world cards.
+    #[serde(
+        rename = "quickFolderEnabled",
+        default = "default_quick_folder_enabled"
+    )]
+    pub quick_folder_enabled: bool,
+    /// Folder the one-click checkbox adds to. Created on demand.
+    #[serde(rename = "quickFolderName", default = "default_quick_folder_name")]
+    pub quick_folder_name: String,
+    /// Show the built-in view that collects favourited / photographed / shared worlds.
+    #[serde(
+        rename = "statusFolderEnabled",
+        default = "default_status_folder_enabled"
+    )]
+    pub status_folder_enabled: bool,
+    /// User order of the built-in library entries. Empty means the default order.
+    #[serde(rename = "libraryItemOrder", default)]
+    pub library_item_order: Vec<String>,
+    /// How much each signal counts when ranking related worlds.
+    #[serde(rename = "relatedWeights", default)]
+    pub related_weights: RelatedWeights,
+    /// Which page opens when the app starts. An id the frontend maps to a
+    /// route, kept as a plain string so adding a destination needs no
+    /// migration of existing preference files.
+    #[serde(rename = "startupPage", default = "default_startup_page")]
+    pub startup_page: String,
+}
+
+/// Relative importance of each "why is this related" signal.
+#[derive(Debug, Clone, Serialize, Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct RelatedWeights {
+    /// Tags shared with the seed worlds.
+    pub tag: f64,
+    /// Made by the same author.
+    pub author: f64,
+    /// Filed in the same folder by the user.
+    pub folder: f64,
+    /// Grouped together by PlanetVRC's editors.
+    pub genre: f64,
+    /// Title and description wording in common.
+    pub text: f64,
+    /// Thumbnail colour. Only boosts candidates that already matched
+    /// something else, so 0 disables it entirely.
+    pub color: f64,
+}
+
+impl Default for RelatedWeights {
+    fn default() -> Self {
+        Self {
+            tag: 1.0,
+            author: 2.5,
+            folder: 1.2,
+            genre: 1.8,
+            text: 1.0,
+            color: 0.8,
+        }
+    }
+}
+
+fn default_status_folder_enabled() -> bool {
+    true
+}
+
+fn default_quick_folder_enabled() -> bool {
+    true
+}
+
+fn default_quick_folder_name() -> String {
+    "気になる★".to_string()
+}
+
+fn default_startup_page() -> String {
+    "all".to_string()
 }
 
 fn default_visible_buttons() -> VisibleButtons {
@@ -388,6 +483,14 @@ impl PreferenceModel {
             sort_direction: "desc".to_string(),
             default_instance_type: DefaultInstanceType::Public,
             visible_buttons: VisibleButtons::default(),
+            recommend_manual_tags: Vec::new(),
+            recommend_excluded_tags: Vec::new(),
+            quick_folder_enabled: default_quick_folder_enabled(),
+            quick_folder_name: default_quick_folder_name(),
+            status_folder_enabled: default_status_folder_enabled(),
+            library_item_order: Vec::new(),
+            related_weights: RelatedWeights::default(),
+            startup_page: default_startup_page(),
         }
     }
 }

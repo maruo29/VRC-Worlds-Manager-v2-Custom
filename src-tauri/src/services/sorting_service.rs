@@ -160,6 +160,9 @@ mod tests {
                 memo: "".to_string(),
                 folders: vec![],
                 hidden: false,
+                is_photographed: false,
+                is_shared: false,
+                is_favorite: false,
             },
         }
     }
@@ -181,12 +184,16 @@ mod tests {
             author_name: author.to_string(),
             favorites,
             last_updated: last_updated.to_string(),
+            publication_date: None,
             visits,
             date_added: date_added.to_string(),
             platform: Platform::PC,
             folders: vec![],
             tags: vec![],
             capacity,
+            is_photographed: false,
+            is_shared: false,
+            is_favorite: false,
         }
     }
 

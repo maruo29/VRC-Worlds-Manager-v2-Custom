@@ -1,12 +1,13 @@
 {
     "manifest_version": 3,
     "name": "VRC Worlds Manager Helper",
-    "version": "1.0",
-    "description": "Open VRChat world links directly in VRC Worlds Manager",
+    "version": "1.2",
+    "description": "Open VRChat world links in VRC Worlds Manager, and mark tweets about worlds already in it",
     "permissions": [
         "contextMenus",
         "tabs",
-        "scripting"
+        "scripting",
+        "storage"
     ],
     "host_permissions": [
         "<all_urls>"
@@ -18,8 +19,13 @@
     },
     "browser_specific_settings": {
         "gecko": {
-            "id": "vrc-worlds-manager-helper@raifaworks.com",
-            "strict_min_version": "109.0"
+            "id": "{f0431f2f-90f8-4588-a0f8-357a370ac9df}",
+            "strict_min_version": "142.0",
+            "data_collection_permissions": {
+                "required": [
+                    "none"
+                ]
+            }
         }
     },
     "content_scripts": [
@@ -30,6 +36,17 @@
             "js": [
                 "content.js"
             ]
+        },
+        {
+            "matches": [
+                "https://x.com/*",
+                "https://twitter.com/*"
+            ],
+            "js": [
+                "vwm-match.js",
+                "twitter.js"
+            ],
+            "run_at": "document_idle"
         }
     ]
 }

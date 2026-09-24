@@ -60,7 +60,15 @@ export function AddToFolderDialog({
     handleCancel,
     isFindPage,
     createdFolder,
+    getFlagState,
+    toggleFlag,
   } = useAddToFolderPopup({ selectedWorlds, currentFolder, onClose });
+
+  const worldFlags = [
+    { flag: 'isFavorite' as const, label: t('world-card:favorite') },
+    { flag: 'isPhotographed' as const, label: t('world-card:photographed') },
+    { flag: 'isShared' as const, label: t('world-card:shared') },
+  ];
 
   return (
     <Dialog open={true} onOpenChange={handleCancel}>
@@ -70,13 +78,13 @@ export function AddToFolderDialog({
           <DialogDescription>
             {selectedWorlds?.length === 1
               ? t(
-                'add-to-folder-dialog:description-single',
-                selectedWorlds.length,
-              )
+                  'add-to-folder-dialog:description-single',
+                  selectedWorlds.length,
+                )
               : t(
-                'add-to-folder-dialog:description-multiple',
-                selectedWorlds?.length,
-              )}
+                  'add-to-folder-dialog:description-multiple',
+                  selectedWorlds?.length,
+                )}
           </DialogDescription>
         </DialogHeader>
 
@@ -100,8 +108,9 @@ export function AddToFolderDialog({
                       key={folder.name}
                       data-folder={folder.name}
                       variant={isAll ? 'default' : 'outline'}
-                      className={`w-full justify-between group ${isAll ? '' : ''
-                        }`}
+                      className={`w-full justify-between group ${
+                        isAll ? '' : ''
+                      }`}
                       onClick={() => handleClick(folder.name)}
                     >
                       <span className="flex flex-row items-center w-full justify-start">
@@ -109,8 +118,9 @@ export function AddToFolderDialog({
                           {folder.world_count}
                         </span>
                         <span
-                          className={`truncate flex-1 pr-2 text-left max-w-[290px] ${isAll ? 'font-medium' : ''
-                            }`}
+                          className={`truncate flex-1 pr-2 text-left max-w-[290px] ${
+                            isAll ? 'font-medium' : ''
+                          }`}
                         >
                           {folder.name}
                         </span>
@@ -168,7 +178,33 @@ export function AddToFolderDialog({
               </div>
             </ScrollArea>
 
-
+            {/* Per-world flags, applied to every selected world on confirm */}
+            <div className="flex flex-wrap items-center gap-4 px-2 pt-1">
+              {worldFlags.map(({ flag, label }) => {
+                const state = getFlagState(flag);
+                return (
+                  <div key={flag} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`world-flag-${flag}`}
+                      checked={
+                        state === 'all'
+                          ? true
+                          : state === 'some'
+                            ? 'indeterminate'
+                            : false
+                      }
+                      onCheckedChange={() => toggleFlag(flag)}
+                    />
+                    <label
+                      htmlFor={`world-flag-${flag}`}
+                      className="text-sm cursor-pointer"
+                    >
+                      {label}
+                    </label>
+                  </div>
+                );
+              })}
+            </div>
 
             {/* Info card for Find Page */}
             {isFindPage && (

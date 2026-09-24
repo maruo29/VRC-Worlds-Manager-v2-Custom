@@ -25,7 +25,10 @@ interface WorldsStoreState {
   addWorldToFolder: (folder: FolderType, worldId: string) => Promise<void>;
   getAllWorlds: () => Promise<WorldDisplayData[]>;
   getFavoriteWorlds: () => Promise<unknown>;
-  updateWorldProperty: (worldId: string, updates: Partial<WorldDisplayData>) => void;
+  updateWorldProperty: (
+    worldId: string,
+    updates: Partial<WorldDisplayData>,
+  ) => void;
 }
 
 async function fetchWorldsImpl(
@@ -52,7 +55,18 @@ async function fetchWorldsImpl(
       if (res.status === 'ok') return res.data;
       throw new Error(res.error);
     }
+    case SpecialFolders.Status: {
+      // Everything the user has marked in any way.
+      const res = await commands.getAllWorlds();
+      if (res.status !== 'ok') throw new Error(res.error);
+      return res.data.filter(
+        (world) => world.isFavorite || world.isPhotographed || world.isShared,
+      );
+    }
     case SpecialFolders.Find:
+    case SpecialFolders.Recommend:
+    case SpecialFolders.Related:
+      // Both are API-backed views; their worlds are owned by the page itself.
       return [];
     default:
       throw new Error(`Unknown folder type: ${folder}`);
@@ -126,15 +140,13 @@ export const useWorldsStore = create<WorldsStoreState>((set, get) => ({
       await commands.addWorldToFolder(folder as string, worldId);
     }
 
-    // optimistic update: append if not exists
-    set((s) => {
-      const entry = s.byKey[key] ?? { worlds: [], isLoading: false };
-      const exists = entry.worlds.some((w) => w.worldId === worldId);
-      const next = exists ? entry.worlds : [res.data, ...entry.worlds];
-      return {
-        byKey: { ...s.byKey, [key]: { ...entry, worlds: next } },
-      } as any;
-    });
+    // Re-read the folder rather than splicing res.data in. getWorld returns
+    // WorldDetails, which has no folders, dateAdded or favourite/photographed/
+    // shared flags; pushed into a list of WorldDisplayData it rendered a card
+    // whose folder tags read `undefined.length` and took the whole page down.
+    // The backend is the only place that knows those fields, and one folder
+    // read is cheap.
+    await get().load(folder, { force: true });
   },
   async getAllWorlds() {
     const res = await commands.getAllWorlds();
@@ -154,7 +166,7 @@ export const useWorldsStore = create<WorldsStoreState>((set, get) => ({
         newByKey[key] = {
           ...entry,
           worlds: entry.worlds.map((w) =>
-            w.worldId === worldId ? { ...w, ...updates } : w
+            w.worldId === worldId ? { ...w, ...updates } : w,
           ),
         };
       }
@@ -182,11 +194,8 @@ export function useWorlds(folder: FolderType) {
   const refresh = () => store.load(folder, { force: true });
   const addWorld = async (worldId: string) => {
     try {
+      // Reloads the folder itself, so there is no separate refresh here.
       await store.addWorldToFolder(folder, worldId);
-      // For special folders, refresh to get the updated data from backend
-      if (!isUserFolder(folder)) {
-        await refresh();
-      }
       toast(t('listview-page:world-added-title'), {
         description: t('listview-page:world-added-description'),
       });

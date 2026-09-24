@@ -205,6 +205,54 @@ pub async fn search_worlds(
 
 #[tauri::command]
 #[specta::specta]
+pub async fn search_worlds_by_author(
+    user_id: String,
+    page: usize,
+) -> Result<Vec<WorldDisplayData>, String> {
+    let cookie_store = AUTHENTICATOR.get().read().await.get_cookies();
+
+    match ApiService::search_worlds_by_author(cookie_store, user_id, page).await {
+        Ok(worlds) => Ok(worlds),
+        Err(e) => {
+            log::info!("Failed to fetch worlds by author: {}", e);
+            Err(format!("Failed to fetch worlds by author: {}", e))
+        }
+    }
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn get_planetvrc_related(
+    world_ids: Vec<String>,
+    limit: usize,
+) -> Result<crate::services::planetvrc_service::PlanetVrcRelated, String> {
+    crate::services::PlanetVrcService::related(world_ids, limit).await
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn get_color_features(
+    world_ids: Vec<String>,
+) -> Result<Vec<crate::services::color_service::ColorFeatureEntry>, String> {
+    Ok(crate::services::ColorService::get_features(world_ids).await)
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn get_color_analyzed_count() -> Result<usize, String> {
+    Ok(crate::services::ColorService::analyzed_count().await)
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn analyze_world_colors(
+    targets: Vec<crate::services::color_service::ColorTarget>,
+) -> Result<crate::services::color_service::ColorAnalysisResult, String> {
+    crate::services::ColorService::analyze(targets).await
+}
+
+#[tauri::command]
+#[specta::specta]
 pub async fn create_world_instance(
     world_id: String,
     instance_type_str: String,
@@ -231,6 +279,35 @@ pub async fn create_world_instance(
             Err(format!("Failed to create world instance: {}", e))
         }
     }
+}
+
+/// Creates an instance meant for going and looking at a world, which is to
+/// say without the self-invite: the launch URL then opens the instance's own
+/// page rather than a notification to accept.
+#[tauri::command]
+#[specta::specta]
+pub async fn create_visit_instance(
+    world_id: String,
+    instance_type_str: String,
+    region_str: String,
+    handle: State<'_, AppHandle>,
+) -> Result<InstanceInfo, String> {
+    let cookie_store = AUTHENTICATOR.get().read().await.get_cookies();
+    let user_id = INITSTATE.get().read().await.user_id.clone();
+
+    ApiService::create_world_instance_without_invite(
+        world_id,
+        instance_type_str,
+        region_str,
+        cookie_store,
+        user_id,
+        (*handle).clone(),
+    )
+    .await
+    .map_err(|e| {
+        log::info!("Failed to create a visit instance: {}", e);
+        format!("Failed to create a visit instance: {}", e)
+    })
 }
 
 #[tauri::command]

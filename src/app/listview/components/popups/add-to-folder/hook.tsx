@@ -8,7 +8,12 @@ import {
   FolderRemovalPreference,
   WorldDisplayData,
 } from '@/lib/bindings';
-import { FolderType, isUserFolder, SpecialFolders } from '@/types/folders';
+import {
+  FolderType,
+  isUserFolder,
+  SpecialFolders,
+  isApiBackedFolder,
+} from '@/types/folders';
 import { error, info } from '@tauri-apps/plugin-log';
 import { mutate as mutateFoldersCache } from 'swr';
 import { usePathname } from 'next/navigation';
@@ -34,7 +39,7 @@ export const useAddToFolderPopup = ({
   const { worlds, refresh } = useWorlds(currentFolder);
 
   const isSpecialFolder = !isUserFolder(currentFolder);
-  const isFindPage = currentFolder === SpecialFolders.Find;
+  const isFindPage = isApiBackedFolder(currentFolder);
 
   const { clearFolderSelections } = useSelectedWorldsStore();
   const bumpMembershipVersion = usePopupStore((s) => s.bumpMembershipVersion);
@@ -44,6 +49,64 @@ export const useAddToFolderPopup = ({
     new Set(),
   );
   const [rememberChoice, setRememberChoice] = useState<boolean>(false);
+
+  // Opened by the quick-folder checkbox: that folder starts already unticked so
+  // confirming both files the world away and takes it out of the quick folder.
+  const preRemoveFolders = usePopupStore((s) => s.addToFolderPreRemove);
+  useEffect(() => {
+    if (!preRemoveFolders || preRemoveFolders.length === 0) return;
+    setFoldersToRemove(new Set(preRemoveFolders));
+  }, [preRemoveFolders]);
+
+  // Favourite / photographed / shared, applied to every selected world on
+  // confirm. Undefined means "leave as is".
+  const [flagOverrides, setFlagOverrides] = useState<{
+    isFavorite?: boolean;
+    isPhotographed?: boolean;
+    isShared?: boolean;
+  }>({});
+
+  type WorldFlag = 'isFavorite' | 'isPhotographed' | 'isShared';
+
+  const getFlagState = (flag: WorldFlag): 'all' | 'some' | 'none' => {
+    const override = flagOverrides[flag];
+    if (override !== undefined) return override ? 'all' : 'none';
+    if (!selectedWorlds || selectedWorlds.length === 0) return 'none';
+
+    const onCount = selectedWorlds.filter((world) => world[flag]).length;
+    if (onCount === 0) return 'none';
+    return onCount === selectedWorlds.length ? 'all' : 'some';
+  };
+
+  const toggleFlag = (flag: WorldFlag) => {
+    const next = getFlagState(flag) !== 'all';
+    setFlagOverrides((current) => ({ ...current, [flag]: next }));
+  };
+
+  const applyFlagOverrides = async () => {
+    const entries = Object.entries(flagOverrides) as [WorldFlag, boolean][];
+    if (entries.length === 0 || !selectedWorlds) return;
+
+    for (const world of selectedWorlds) {
+      for (const [flag, value] of entries) {
+        if (world[flag] === value) continue;
+        try {
+          if (flag === 'isFavorite') {
+            await commands.setWorldFavorite(world.worldId, value);
+          } else if (flag === 'isPhotographed') {
+            await commands.setWorldPhotographed(world.worldId, value);
+          } else {
+            await commands.setWorldShared(world.worldId, value);
+          }
+          useWorldsStore
+            .getState()
+            .updateWorldProperty(world.worldId, { [flag]: value });
+        } catch (e) {
+          error(`[AddToFolder] Failed to set ${flag}: ${e}`);
+        }
+      }
+    }
+  };
 
   const [dialogPage, setDialogPage] = useState<'folders' | 'removeConfirm'>(
     'folders',
@@ -311,7 +374,13 @@ export const useAddToFolderPopup = ({
         foldersToAdd,
       ).join(', ')}] queuedRemove=[${Array.from(foldersToRemove).join(', ')}]`,
     );
+    // Opened from the quick-folder checkbox: the user is only filing this
+    // world away, so do not also ask whether to pull it out of the folder
+    // they happen to be looking at.
+    const isQuickFolderFlow = !!preRemoveFolders && preRemoveFolders.length > 0;
+
     if (
+      !isQuickFolderFlow &&
       !isSpecialFolder &&
       currentFolder &&
       !foldersToRemove.has(currentFolder.toString())
@@ -428,6 +497,8 @@ export const useAddToFolderPopup = ({
         Array.from(foldersToAdd),
         Array.from(foldersToRemove),
       );
+      await applyFlagOverrides();
+      setFlagOverrides({});
       setFoldersToAdd(new Set());
       setFoldersToRemove(new Set());
       info('[AddToFolder] confirm done. Closing dialog');
@@ -462,7 +533,8 @@ export const useAddToFolderPopup = ({
       info(
         `[AddToFolder] handleAddToFolders start isFindPage=${isFindPage} add=[${foldersToAdd.join(
           ', ',
-        )}] remove=[${foldersToRemove.join(', ')}] selected=${selectedWorlds.length
+        )}] remove=[${foldersToRemove.join(', ')}] selected=${
+          selectedWorlds.length
         }`,
       );
       if (isFindPage) {
@@ -486,9 +558,9 @@ export const useAddToFolderPopup = ({
           description:
             selectedWorlds.length > 1
               ? t(
-                'listview-page:worlds-added-description-multiple',
-                selectedWorlds.length,
-              )
+                  'listview-page:worlds-added-description-multiple',
+                  selectedWorlds.length,
+                )
               : t('listview-page:worlds-added-description-single'),
         });
       }
@@ -599,14 +671,14 @@ export const useAddToFolderPopup = ({
           description:
             selectedWorlds.length > 1
               ? t(
-                'listview-page:folders-updated-multiple',
-                selectedWorlds[0].name,
-                selectedWorlds.length - 1,
-              )
+                  'listview-page:folders-updated-multiple',
+                  selectedWorlds[0].name,
+                  selectedWorlds.length - 1,
+                )
               : t(
-                'listview-page:folders-updated-single',
-                selectedWorlds[0].name,
-              ),
+                  'listview-page:folders-updated-single',
+                  selectedWorlds[0].name,
+                ),
           action: {
             label: t('listview-page:undo-button'),
             onClick: async () => {
@@ -640,23 +712,27 @@ export const useAddToFolderPopup = ({
 
         // Update world properties in the store to reflect changes immediately
         for (const state of originalStates) {
-          const currentFolders = new Set(membershipByWorld.get(state.worldId) ?? []);
+          const currentFolders = new Set(
+            membershipByWorld.get(state.worldId) ?? [],
+          );
 
           // Apply changes locally to calculate new state
-          state.addedTo.forEach(f => currentFolders.add(f));
-          state.removedFrom.forEach(f => currentFolders.delete(f));
+          state.addedTo.forEach((f) => currentFolders.add(f));
+          state.removedFrom.forEach((f) => currentFolders.delete(f));
 
           useWorldsStore.getState().updateWorldProperty(state.worldId, {
-            folders: Array.from(currentFolders)
+            folders: Array.from(currentFolders),
           });
         }
 
         await refresh();
       }
-      // For Find page, membership has changed; bump version so grids recompute existence
-      if (isFindPage) {
-        bumpMembershipVersion();
-      }
+      // Membership changed, so tell every grid to re-read it. This used to
+      // fire only on the API-backed pages, where it refreshes the "already
+      // added" badge - but the quick-folder checkbox reads the same signal,
+      // so on a library page a world taken out of the quick folder here kept
+      // a ticked box and clicking it just reopened this dialog, for ever.
+      bumpMembershipVersion();
       // Refresh folders list to update world counts in sidebar
       await refreshFolders();
       info('[AddToFolder] handleAddToFolders completed successfully');
@@ -681,6 +757,8 @@ export const useAddToFolderPopup = ({
     handleNewNameKey,
     listRef,
     getFolderState,
+    getFlagState,
+    toggleFlag,
     handleClick,
     isLoading,
     dialogPage,

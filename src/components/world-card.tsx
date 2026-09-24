@@ -6,14 +6,30 @@ import QQ from '@/../public/icons/VennColorQQ.svg';
 import { Platform } from '@/types/worlds';
 import { CardSize, WorldDisplayData, VisibleButtons } from '@/lib/bindings';
 import { useLocalization } from '@/hooks/use-localization';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from './ui/tooltip';
 import { useFolders } from '@/app/listview/hook/use-folders';
 
 // Folder tags component with 2-line max and overflow indicator
-function FolderTags({ folders, size }: { folders: string[]; size: CardSize }) {
+function FolderTags({
+  folders,
+  size,
+  leading,
+}: {
+  folders: string[];
+  size: CardSize;
+  leading?: React.ReactNode;
+}) {
   const { folders: allFolders } = useFolders();
 
-  if (!folders || folders.length === 0) return null;
+  const hasFolders = !!folders && folders.length > 0;
+  // The card body only has room for the name plus one row of chips, so the
+  // caption shares that row instead of taking a line of its own.
+  if (!hasFolders && !leading) return null;
 
   const tagSizeClasses: Record<CardSize, string> = {
     Compact: 'text-[10px] px-1.5 py-0.5',
@@ -25,9 +41,9 @@ function FolderTags({ folders, size }: { folders: string[]; size: CardSize }) {
   return (
     <div className="relative overflow-hidden" style={{ maxHeight: '3.5em' }}>
       <div className="flex flex-wrap gap-1">
-        {folders.map((folderName, index) => {
+        {leading}
+        {(folders ?? []).map((folderName, index) => {
           const folderData = allFolders.find((f) => f.name === folderName);
-          // @ts-ignore
           const bgColor = folderData?.color || '#9333ea'; // Default purple
           return (
             <span
@@ -40,12 +56,36 @@ function FolderTags({ folders, size }: { folders: string[]; size: CardSize }) {
           );
         })}
       </div>
-      {folders.length > 3 && (
+      {(folders ?? []).length > 3 && (
         <div className="absolute bottom-0 right-0 bg-gradient-to-l from-card via-card to-transparent pl-4 pr-1 text-muted-foreground text-xs">
           …
         </div>
       )}
     </div>
+  );
+}
+
+/**
+ * Short explanatory line under the world name (e.g. why a world was
+ * recommended). Sits with the folder tags so it never covers the thumbnail.
+ */
+function CardCaption({ caption, size }: { caption?: string; size: CardSize }) {
+  if (!caption) return null;
+
+  const captionSizeClasses: Record<CardSize, string> = {
+    Compact: 'text-[10px] px-1.5 py-0.5',
+    Normal: 'text-xs px-2 py-0.5',
+    Expanded: 'text-xs px-2 py-0.5',
+    Original: 'text-xs px-2 py-0.5',
+  };
+
+  return (
+    <span
+      className={`inline-block max-w-full rounded border bg-primary/10 text-primary border-primary/30 truncate whitespace-nowrap ${captionSizeClasses[size]}`}
+      title={caption}
+    >
+      {caption}
+    </span>
   );
 }
 
@@ -56,10 +96,20 @@ interface WorldCardPreviewProps {
   onTogglePhotographed?: (worldId: string, current: boolean) => void;
   onToggleShared?: (worldId: string, current: boolean) => void;
   isVisibleButtons?: VisibleButtons;
+  /** Optional line shown under the world name. */
+  caption?: string;
 }
 
 export function WorldCardPreview(props: WorldCardPreviewProps) {
-  const { size, world, onToggleFavorite, onTogglePhotographed, onToggleShared, isVisibleButtons } = props;
+  const {
+    size,
+    world,
+    onToggleFavorite,
+    onTogglePhotographed,
+    onToggleShared,
+    isVisibleButtons,
+    caption,
+  } = props;
   const { t } = useLocalization();
   const sizeClasses: Record<CardSize, string> = {
     Compact: 'w-48 h-32',
@@ -124,7 +174,10 @@ export function WorldCardPreview(props: WorldCardPreviewProps) {
         </div>
 
         {/* Status flags overlay */}
-        <div className="absolute bottom-2 right-2 z-10 flex gap-1">
+        <div
+          className="absolute bottom-2 right-2 z-10 flex gap-1"
+          data-no-marquee
+        >
           {(!isVisibleButtons || isVisibleButtons.favorite) && (
             <TooltipProvider>
               <Tooltip>
@@ -200,28 +253,44 @@ export function WorldCardPreview(props: WorldCardPreviewProps) {
       {size === 'Compact' && (
         <div className="p-2 flex-1 flex flex-col justify-center overflow-hidden">
           <h3 className="font-medium truncate text-sm">{world.name}</h3>
-          <FolderTags folders={world.folders} size={size} />
+          <FolderTags
+            folders={world.folders}
+            size={size}
+            leading={<CardCaption caption={caption} size={size} />}
+          />
         </div>
       )}
 
       {size === 'Normal' && (
         <div className="p-2 space-y-1 flex-1 flex flex-col justify-center overflow-hidden">
           <h3 className="font-medium truncate text-base">{world.name}</h3>
-          <FolderTags folders={world.folders} size={size} />
+          <FolderTags
+            folders={world.folders}
+            size={size}
+            leading={<CardCaption caption={caption} size={size} />}
+          />
         </div>
       )}
 
       {size === 'Expanded' && (
         <div className="p-2 space-y-1 flex-1 flex flex-col overflow-hidden">
           <h3 className="font-medium truncate text-lg">{world.name}</h3>
-          <FolderTags folders={world.folders} size={size} />
+          <FolderTags
+            folders={world.folders}
+            size={size}
+            leading={<CardCaption caption={caption} size={size} />}
+          />
         </div>
       )}
 
       {size === 'Original' && (
         <div className="p-2 flex-1 flex flex-col overflow-hidden">
           <h3 className="font-medium truncate text-base">{world.name}</h3>
-          <FolderTags folders={world.folders} size={size} />
+          <FolderTags
+            folders={world.folders}
+            size={size}
+            leading={<CardCaption caption={caption} size={size} />}
+          />
         </div>
       )}
     </div>

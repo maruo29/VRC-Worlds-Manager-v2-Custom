@@ -32,6 +32,7 @@ import { WorldCardPreview } from '@/components/world-card';
 import { GroupInstanceCreator } from './group-instance-creator';
 import { Platform } from '@/types/worlds';
 import { GroupInstanceType, InstanceType } from '@/types/instances';
+import { WorldShotsPanel } from '@/app/listview/components/world-shots-panel';
 import { InstanceRegion } from '@/lib/bindings';
 import { useLocalization } from '@/hooks/use-localization';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -408,7 +409,9 @@ export function WorldDetailPopup({
       let updatedFolders: string[];
       if (isRemoving) {
         // Remove folder
-        info(`[WorldDetails] Removing world "${worldId}" from folder "${folder}"`);
+        info(
+          `[WorldDetails] Removing world "${worldId}" from folder "${folder}"`,
+        );
         const result = await commands.removeWorldFromFolder(folder, worldId);
         if (result.status !== 'ok') {
           error(
@@ -417,7 +420,9 @@ export function WorldDetailPopup({
           return;
         }
         updatedFolders = worldFolders.filter((f) => f !== folder);
-        info(`[WorldDetails] Successfully removed. Updated folders: [${updatedFolders.join(', ')}]`);
+        info(
+          `[WorldDetails] Successfully removed. Updated folders: [${updatedFolders.join(', ')}]`,
+        );
       } else {
         // Add folder
         info(`[WorldDetails] Adding world "${worldId}" to folder "${folder}"`);
@@ -429,7 +434,9 @@ export function WorldDetailPopup({
           return;
         }
         updatedFolders = [...worldFolders, folder];
-        info(`[WorldDetails] Successfully added. Updated folders: [${updatedFolders.join(', ')}]`);
+        info(
+          `[WorldDetails] Successfully added. Updated folders: [${updatedFolders.join(', ')}]`,
+        );
       }
       setWorldFolders(updatedFolders);
       // Optimistically bump cached folder count so sidebar updates immediately
@@ -450,13 +457,19 @@ export function WorldDetailPopup({
         `[WorldDetails] Optimistic folder count delta applied: ${folder}:${delta}`,
       );
       // Update the world property in the store to reflect changes immediately in the UI
-      useWorldsStore.getState().updateWorldProperty(worldId, { folders: updatedFolders });
+      useWorldsStore
+        .getState()
+        .updateWorldProperty(worldId, { folders: updatedFolders });
 
       // Also update filteredWorlds for immediate UI refresh if we are in a filtered view
       const currentFiltered = useWorldFiltersStore.getState().filteredWorlds;
-      useWorldFiltersStore.getState().setFilteredWorlds(
-        currentFiltered.map((w) => w.worldId === worldId ? { ...w, folders: updatedFolders } : w)
-      );
+      useWorldFiltersStore
+        .getState()
+        .setFilteredWorlds(
+          currentFiltered.map((w) =>
+            w.worldId === worldId ? { ...w, folders: updatedFolders } : w,
+          ),
+        );
 
       refresh();
     } catch (e) {
@@ -547,20 +560,11 @@ export function WorldDetailPopup({
                       <div className="flex justify-center items-center pl-8 w-full sm:w-1/3">
                         <WorldCardPreview
                           size="Normal"
+                          // Already a WorldDisplayData; this preview just
+                          // shows it without the user's own filing on it.
                           world={{
-                            worldId: cachedWorldData.worldId,
-                            name: cachedWorldData.name,
-                            thumbnailUrl: cachedWorldData.thumbnailUrl,
-                            authorName: cachedWorldData.authorName,
-                            favorites: cachedWorldData.favorites,
-                            lastUpdated: cachedWorldData.lastUpdated,
-                            visits: cachedWorldData.visits,
-                            dateAdded: cachedWorldData.dateAdded,
-                            platform:
-                              cachedWorldData.platform as unknown as import('@/types/worlds').Platform,
+                            ...cachedWorldData,
                             folders: [],
-                            tags: cachedWorldData.tags,
-                            capacity: cachedWorldData.capacity,
                             isPhotographed: false,
                             isShared: false,
                             isFavorite: false,
@@ -596,23 +600,23 @@ export function WorldDetailPopup({
                               <div>
                                 {cachedWorldData.dateAdded
                                   ? (() => {
-                                    const [date, time] =
-                                      cachedWorldData.dateAdded.split('T');
-                                    const timeWithoutMs = time
-                                      ?.split('.')[0]
-                                      ?.replace('Z', '');
-                                    return (
-                                      <>
-                                        {date}
-                                        {timeWithoutMs && (
-                                          <span className="text-gray-500">
-                                            {' '}
-                                            {timeWithoutMs}
-                                          </span>
-                                        )}
-                                      </>
-                                    );
-                                  })()
+                                      const [date, time] =
+                                        cachedWorldData.dateAdded.split('T');
+                                      const timeWithoutMs = time
+                                        ?.split('.')[0]
+                                        ?.replace('Z', '');
+                                      return (
+                                        <>
+                                          {date}
+                                          {timeWithoutMs && (
+                                            <span className="text-gray-500">
+                                              {' '}
+                                              {timeWithoutMs}
+                                            </span>
+                                          )}
+                                        </>
+                                      );
+                                    })()
                                   : ''}
                               </div>
 
@@ -869,6 +873,13 @@ export function WorldDetailPopup({
                     </div>
                   </div>
                   <Separator className="my-4" />
+                  <div>
+                    <div className="text-sm font-semibold mb-2">
+                      {t('world-shots:title')}
+                    </div>
+                    <WorldShotsPanel worldId={worldDetails.worldId} />
+                  </div>
+                  <Separator className="my-4" />
                   <div className="flex gap-4">
                     <div className="flex flex-col gap-4 w-2/3">
                       <div>
@@ -1052,7 +1063,9 @@ export function WorldDetailPopup({
                               onClick={() => setPopup('showCreateFolder', true)}
                             >
                               <Plus className="h-4 w-4" />
-                              <span className="text-sm">{t('app-sidebar:add-folder')}</span>
+                              <span className="text-sm">
+                                {t('app-sidebar:add-folder')}
+                              </span>
                             </Button>
                           </div>
                         </div>

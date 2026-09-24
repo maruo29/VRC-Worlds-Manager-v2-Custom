@@ -1,12 +1,13 @@
 {
     "manifest_version": 3,
     "name": "VRC Worlds Manager Helper",
-    "version": "1.0",
-    "description": "Open VRChat world links directly in VRC Worlds Manager",
+    "version": "1.1",
+    "description": "Open VRChat world links in VRC Worlds Manager, and mark tweets about worlds already in it",
     "permissions": [
         "contextMenus",
         "tabs",
-        "scripting"
+        "scripting",
+        "storage"
     ],
     "host_permissions": [
         "<all_urls>"
@@ -22,6 +23,17 @@
             "js": [
                 "content.js"
             ]
+        },
+        {
+            "matches": [
+                "https://x.com/*",
+                "https://twitter.com/*"
+            ],
+            "js": [
+                "vwm-match.js",
+                "twitter.js"
+            ],
+            "run_at": "document_idle"
         }
     ]
 }

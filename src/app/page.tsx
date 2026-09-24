@@ -5,6 +5,7 @@ import { Loader2 } from 'lucide-react';
 import { commands } from '@/lib/bindings';
 import { useLocalization } from '@/hooks/use-localization';
 import { info, error } from '@tauri-apps/plugin-log';
+import { resolveStartupRoute } from '@/lib/startup-page';
 
 export default function Home() {
   const router = useRouter();
@@ -33,7 +34,7 @@ export default function Home() {
 
           if (authResult.status === 'ok') {
             info('User is authenticated');
-            router.push('/listview/folders/special/all');
+            router.push(await resolveStartupRoute());
           } else {
             router.push('/login');
           }

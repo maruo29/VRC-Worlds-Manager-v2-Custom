@@ -3,6 +3,7 @@
 import React, { Suspense, useState, useEffect, useRef } from 'react';
 import { AppSidebar } from './components/app-sidebar';
 import { PopupManager } from './hook/usePopups/popup-manager';
+import { WorldTourProgress } from './components/world-tour-progress';
 import { PatreonProvider } from '@/contexts/patreon-context';
 import type { CSSProperties } from 'react';
 
@@ -111,6 +112,7 @@ export function ListViewClientShell({
             {children}
           </main>
           <PopupManager />
+          <WorldTourProgress />
         </div>
       </PatreonProvider>
     </Suspense>

@@ -44,11 +44,19 @@ pub struct CustomPreferences {
     pub default_instance_type: DefaultInstanceType,
 
     /// Visible buttons settings
-    #[serde(rename = "visibleButtons", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "visibleButtons",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub visible_buttons: Option<crate::definitions::VisibleButtons>,
 
     /// Dont show remove from folder preference
-    #[serde(rename = "dontShowRemoveFromFolder", default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "dontShowRemoveFromFolder",
+        default,
+        skip_serializing_if = "Option::is_none"
+    )]
     pub dont_show_remove_from_folder: Option<crate::definitions::FolderRemovalPreference>,
 }
 

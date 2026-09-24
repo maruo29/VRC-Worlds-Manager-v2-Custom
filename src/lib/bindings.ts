@@ -448,6 +448,212 @@ async setVisibleButtons(visibleButtons: VisibleButtons) : Promise<Result<null, s
     else return { status: "error", error: e  as any };
 }
 },
+async getRecommendManualTags() : Promise<Result<string[], string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_recommend_manual_tags") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async setRecommendManualTags(tags: string[]) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("set_recommend_manual_tags", { tags }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async getRecommendExcludedTags() : Promise<Result<string[], string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_recommend_excluded_tags") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async setRecommendExcludedTags(tags: string[]) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("set_recommend_excluded_tags", { tags }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async getQuickFolderEnabled() : Promise<Result<boolean, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_quick_folder_enabled") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async setQuickFolderEnabled(enabled: boolean) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("set_quick_folder_enabled", { enabled }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async getQuickFolderName() : Promise<Result<string, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_quick_folder_name") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async setQuickFolderName(name: string) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("set_quick_folder_name", { name }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async getStatusFolderEnabled() : Promise<Result<boolean, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_status_folder_enabled") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async setStatusFolderEnabled(enabled: boolean) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("set_status_folder_enabled", { enabled }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async getLibraryItemOrder() : Promise<Result<string[], string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_library_item_order") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async setLibraryItemOrder(order: string[]) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("set_library_item_order", { order }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async getRelatedWeights() : Promise<Result<RelatedWeights, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_related_weights") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async setRelatedWeights(weights: RelatedWeights) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("set_related_weights", { weights }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async getStartupPage() : Promise<Result<string, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_startup_page") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async setStartupPage(page: string) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("set_startup_page", { page }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+/**
+ * Captures the VRChat window and files the result under the given world.
+ */
+async captureWorldShot(worldId: string) : Promise<Result<WorldShot, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("capture_world_shot", { worldId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async getWorldShots(worldId: string) : Promise<Result<WorldShot[], string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_world_shots", { worldId }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+/**
+ * One shot as a `data:` URL, for the frontend to put straight in an <img>.
+ */
+async readWorldShot(worldId: string, fileName: string) : Promise<Result<string, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("read_world_shot", { worldId, fileName }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async deleteWorldShot(worldId: string, fileName: string) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("delete_world_shot", { worldId, fileName }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+/**
+ * Bytes held by every stored shot, for the settings screen.
+ */
+async getWorldShotStorage() : Promise<number> {
+    return await TAURI_INVOKE("get_world_shot_storage");
+},
+/**
+ * Starts tailing VRChat's log. The frontend then listens for
+ * `vrchat-world-entered` to know when a world has finished loading.
+ * Every world known to have been visited.
+ */
+async getVisitedWorlds() : Promise<VisitedWorld[]> {
+    return await TAURI_INVOKE("get_visited_worlds");
+},
+/**
+ * Rebuilds the visited list from whatever VRChat's logs still hold, and from
+ * VRChat's own recently-visited listing. Both only ever add.
+ */
+async refreshVisitedWorlds() : Promise<Result<number, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("refresh_visited_worlds") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async startVrchatLogWatch() : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("start_vrchat_log_watch") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async stopVrchatLogWatch() : Promise<void> {
+    await TAURI_INVOKE("stop_vrchat_log_watch");
+},
+async isVrchatLogWatching() : Promise<boolean> {
+    return await TAURI_INVOKE("is_vrchat_log_watching");
+},
 async tryLogin() : Promise<Result<null, string>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("try_login") };
@@ -520,6 +726,46 @@ async searchWorlds(sort: string, tags: string[], excludeTags: string[], search: 
     else return { status: "error", error: e  as any };
 }
 },
+async searchWorldsByAuthor(userId: string, page: number) : Promise<Result<WorldDisplayData[], string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("search_worlds_by_author", { userId, page }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async getPlanetvrcRelated(worldIds: string[], limit: number) : Promise<Result<PlanetVrcRelated, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_planetvrc_related", { worldIds, limit }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async getColorFeatures(worldIds: string[]) : Promise<Result<ColorFeatureEntry[], string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_color_features", { worldIds }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async getColorAnalyzedCount() : Promise<Result<number, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_color_analyzed_count") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async analyzeWorldColors(targets: ColorTarget[]) : Promise<Result<ColorAnalysisResult, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("analyze_world_colors", { targets }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
 async createWorldInstance(worldId: string, instanceTypeStr: string, regionStr: string) : Promise<Result<InstanceInfo, string>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("create_world_instance", { worldId, instanceTypeStr, regionStr }) };
@@ -547,6 +793,19 @@ async getPermissionForCreateGroupInstance(groupId: string) : Promise<Result<Grou
 async createGroupInstance(worldId: string, groupId: string, instanceTypeStr: string, allowedRoles: string[] | null, regionStr: string, queueEnabled: boolean) : Promise<Result<InstanceInfo, string>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("create_group_instance", { worldId, groupId, instanceTypeStr, allowedRoles, regionStr, queueEnabled }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+/**
+ * Creates an instance meant for going and looking at a world, which is to
+ * say without the self-invite: the launch URL then opens the instance's own
+ * page rather than a notification to accept.
+ */
+async createVisitInstance(worldId: string, instanceTypeStr: string, regionStr: string) : Promise<Result<InstanceInfo, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("create_visit_instance", { worldId, instanceTypeStr, regionStr }) };
 } catch (e) {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
@@ -762,14 +1021,6 @@ async setWorldFavorite(worldId: string, isFavorite: boolean) : Promise<Result<nu
     else return { status: "error", error: e  as any };
 }
 },
-async sortWorldsDisplay(worlds: WorldDisplayData[], sortField: string, sortDirection: string) : Promise<Result<WorldDisplayData[], string>> {
-    try {
-    return { status: "ok", data: await TAURI_INVOKE("sort_worlds_display", { worlds, sortField, sortDirection }) };
-} catch (e) {
-    if(e instanceof Error) throw e;
-    else return { status: "error", error: e  as any };
-}
-},
 async resolveRedirects(url: string) : Promise<Result<string, string>> {
     try {
     return { status: "ok", data: await TAURI_INVOKE("resolve_redirects", { url }) };
@@ -780,6 +1031,28 @@ async resolveRedirects(url: string) : Promise<Result<string, string>> {
 },
 async getStartupDeepLink() : Promise<string | null> {
     return await TAURI_INVOKE("get_startup_deep_link");
+},
+/**
+ * Writes a search snapshot the user picked a path for with the save dialog.
+ */
+async saveSearchSnapshot(path: string, contents: string) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("save_search_snapshot", { path, contents }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+/**
+ * Reads back a snapshot written by `save_search_snapshot`.
+ */
+async loadSearchSnapshot(path: string) : Promise<Result<string, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("load_search_snapshot", { path }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
 }
 }
 
@@ -800,8 +1073,28 @@ taskStatusChanged: "task-status-changed"
 
 export type BackupMetaData = { date: string; number_of_folders: number; number_of_worlds: number; app_version: string }
 export type CardSize = "Compact" | "Normal" | "Expanded" | "Original"
+export type ColorAnalysisResult = { analyzed: number; failed: number; 
+/**
+ * Worlds already cached before this call.
+ */
+skipped: number }
+export type ColorFeatureEntry = { worldId: string; features: ColorFeatures }
+export type ColorFeatures = { 
+/**
+ * Hue bins followed by achromatic lightness bins, summing to 1.
+ */
+histogram: number[]; meanLightness: number; meanSaturation: number; 
+/**
+ * Spread of lightness; separates flat gloom from high-contrast neon.
+ */
+lightnessSpread: number }
+export type ColorTarget = { worldId: string; 
+/**
+ * The full-size image URL as stored on the world; resized here.
+ */
+imageUrl: string }
 export type DefaultInstanceType = "public" | "group" | "friends+" | "friends" | "invite+" | "invite"
-export type FilterItemSelectorStarredType = "Author" | "Tag" | "ExcludeTag" | "Folder"
+export type FilterItemSelectorStarredType = "Author" | "Tag" | "ExcludeTag" | "Folder" | "RecommendTag" | "RecommendExcludeTag"
 export type FolderData = { name: string; world_count: number; color: string | null }
 export type FolderRemovalPreference = "ask" | "alwaysRemove" | "neverRemove"
 export type GroupInstanceCreateAllowedType = { normal: boolean; plus: boolean; public: boolean; restricted: boolean }
@@ -815,16 +1108,87 @@ export type InstanceRegion = "us" | "use" | "eu" | "jp"
 export type LocalizedChanges = { version: string; pre_release: boolean; features: string[]; fixes: string[]; others: string[] }
 export type PatreonData = { platinumSupporter: string[]; goldSupporter: string[]; silverSupporter: string[]; bronzeSupporter: string[]; basicSupporter: string[] }
 export type PatreonVRChatNames = { platinumSupporter: string[]; goldSupporter: string[]; silverSupporter: string[]; bronzeSupporter: string[]; basicSupporter: string[] }
+export type PlanetVrcRelated = { 
+/**
+ * Human readable tag names the seeds share, for display.
+ */
+tagNames: string[]; categoryNames: string[]; 
+/**
+ * VRChat world ids of related worlds, most relevant tag first.
+ */
+worldIds: string[]; 
+/**
+ * Seeds PlanetVRC does not list.
+ */
+missingWorldIds: string[] }
 export type Platform = "PC" | "Quest" | "Cross-Platform"
 export type PreviousMetadata = { number_of_folders: number; number_of_worlds: number }
+/**
+ * Relative importance of each "why is this related" signal.
+ */
+export type RelatedWeights = { 
+/**
+ * Tags shared with the seed worlds.
+ */
+tag: number; 
+/**
+ * Made by the same author.
+ */
+author: number; 
+/**
+ * Filed in the same folder by the user.
+ */
+folder: number; 
+/**
+ * Grouped together by PlanetVRC's editors.
+ */
+genre: number; 
+/**
+ * Title and description wording in common.
+ */
+text: number; 
+/**
+ * Thumbnail colour. Only boosts candidates that already matched
+ * something else, so 0 disables it entirely.
+ */
+color: number }
 export type TaskStatus = "Running" | "Completed" | "Cancelled" | "Failed"
 export type TaskStatusChanged = { id: string; status: TaskStatus }
 export type UpdateChannel = "stable" | "pre-release"
 export type UserGroup = { id: string; name: string; shortCode: string; discriminator: string; description: string; iconUrl?: string | null; bannerUrl?: string | null; privacy: string; memberCount: number; groupId: string; memberVisibility: GroupMemberVisibility; isRepresenting: boolean; mutualGroup: boolean }
 export type VisibleButtons = { favorite: boolean; photographed: boolean; shared: boolean }
+export type VisitedWorld = { worldId: string; 
+/**
+ * Epoch millis, or 0 when the date is not known.
+ */
+lastVisited: number }
 export type WorldBlacklist = { worlds: string[] }
 export type WorldDetails = { worldId: string; name: string; thumbnailUrl: string; authorName: string; authorId: string; favorites: number; lastUpdated: string; visits: number; platform: Platform; description: string; tags: string[]; capacity: number; recommendedCapacity: number | null; publicationDate: string | null }
-export type WorldDisplayData = { worldId: string; name: string; thumbnailUrl: string; authorName: string; favorites: number; lastUpdated: string; visits: number; dateAdded: string; platform: Platform; folders: string[]; tags: string[]; capacity: number; isPhotographed: boolean; isShared: boolean; isFavorite: boolean }
+export type WorldDisplayData = { worldId: string; name: string; thumbnailUrl: string; authorName: string; favorites: number; lastUpdated: string; 
+/**
+ * When the world was first made public, RFC 3339. `None` for worlds
+ * VRChat reports as unpublished, and for anything saved before this
+ * field existed. Distinct from `last_updated`, which is the last edit.
+ */
+publicationDate: string | null; visits: number; dateAdded: string; platform: Platform; folders: string[]; tags: string[]; capacity: number; isPhotographed: boolean; isShared: boolean; isFavorite: boolean }
+export type WorldShot = { worldId: string; 
+/**
+ * File name, unique within the world's folder.
+ */
+fileName: string; 
+/**
+ * Absolute path, for the frontend to load through the asset protocol.
+ */
+path: string; 
+/**
+ * Milliseconds since the epoch, from the file name.
+ */
+takenAt: number; width: number; height: number; bytes: number; 
+/**
+ * True when the frame was almost entirely black, so the UI can offer to
+ * retake it rather than leaving the user wondering.
+ */
+looksBlank: boolean }
 
 /** tauri-specta globals **/
 
